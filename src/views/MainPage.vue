@@ -3,8 +3,13 @@
         <div class="introduction">
             <p>{{introduction}}</p>
         </div>
-        <div class="categories">
-            <h1>STUB</h1>
+        <div class="categories" v-for="category in categories">
+            <div>
+                <p>
+                    {{category.name}}
+                </p>
+                <img :src="(`./img/${category.src}`)">
+            </div>
         </div>
         <div class="site-description">
             <h1>STUB</h1>
@@ -18,7 +23,15 @@
 export default {
     data(){
         return{
-            introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса'
+            introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса',
+            categories:[
+                {
+                    name: "category1",
+                    src: "category1.svg"
+                }
+                
+
+            ]
         }
     }
 }
