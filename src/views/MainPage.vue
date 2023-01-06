@@ -3,23 +3,23 @@
         <div class="introduction">
             <p>{{introduction}}</p>
         </div>
-        <div class="categories" v-for="category in categories">
-            <div>
+        <div class="category-block">
+            <div class="category" v-for="category in categories">
                 <p>
                     {{category.name}}
                 </p>
                 <img :src="(`./img/${category.src}`)">
             </div>
         </div>
-        <div class="site-description">
+        <!-- <div class="site-description">
             <h1>STUB</h1>
         </div>
         <div class="contact-request">
             <h1>STUB</h1>
-        </div>
+        </div> -->
     </div>
 </template>
-<script lang="ts">
+<script lang="ts" scoped>
 export default {
     data(){
         return{
@@ -28,15 +28,24 @@ export default {
                 {
                     name: "category1",
                     src: "category1.svg"
-                }
-                
-
+                },
+                {
+                    name: "category2",
+                    src: "category1.svg"
+                },
+                {
+                    name: "category3",
+                    src: "category1.svg"
+                }  
             ]
         }
     }
 }
 </script>
 <style>
+img{
+    max-width: fit-content;
+}
 .main-wrapper{
     height: 100%;
     display: flex;
@@ -59,5 +68,17 @@ line-height: 28px;
 }
 .slider{
     flex-grow: 1;
+}
+.category-block{
+    display: flex;
+    justify-content: space-evenly;
+}
+.category{
+    display: flex;
+    justify-content: flex-start;
+
+}
+.category p {
+    max-width: calc(10% + 5px);
 }
 </style>

@@ -62,7 +62,7 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
     button{
         color: white;
         user-select: none;
