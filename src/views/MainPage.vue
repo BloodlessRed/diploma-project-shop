@@ -1,83 +1,88 @@
 <template>
+    <Header></Header>
     <div class="main-wrapper">
         <div class="introduction">
-            <p>{{introduction}}</p>
+            <p>{{ introduction }}</p>
         </div>
         <div class="category-block">
             <div class="category" v-for="category in categories">
-                <p>
-                    {{category.name}}
-                </p>
-                <img :src="(`./img/${category.src}`)">
+                <router-link :to="category.name">
+                    <p>
+                        {{ category.name }}
+                    </p>
+                    <img :src="`./img/${category.src}`">
+                </router-link>
             </div>
         </div>
-        <!-- <div class="site-description">
-            <h1>STUB</h1>
-        </div>
-        <div class="contact-request">
-            <h1>STUB</h1>
-        </div> -->
     </div>
 </template>
 <script lang="ts" scoped>
 export default {
-    data(){
-        return{
+    data() {
+        return {
             introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса',
-            categories:[
+            categories: [
                 {
-                    name: "category1",
+                    name: "Nutrunners",
                     src: "category1.svg"
                 },
                 {
-                    name: "category2",
+                    name: "SecondaryMarket",
                     src: "category1.svg"
                 },
                 {
                     name: "category3",
                     src: "category1.svg"
-                }  
+                }
             ]
         }
     }
 }
 </script>
 <style>
-img{
+img {
     max-width: fit-content;
 }
-.main-wrapper{
+
+.main-wrapper {
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 0px 220px
 }
+
 .main-wrapper * {
     width: 100%;
 }
-.introduction{
+
+.introduction {
     display: flex;
 }
-.introduction:first-child{
+
+.introduction:first-child {
     font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 24px;
-line-height: 28px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 28px;
 }
-.slider{
+
+.slider {
     flex-grow: 1;
 }
-.category-block{
+
+.category-block {
     display: flex;
     justify-content: space-evenly;
 }
-.category{
+
+.category {
     display: flex;
     justify-content: flex-start;
 
 }
+
 .category p {
     max-width: calc(10% + 5px);
 }

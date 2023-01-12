@@ -9,7 +9,7 @@
         </div>
         <div class="line">
             <div class="button-space" >
-                <a>Каталог</a>
+                <router-link :to="{name:'Home'}">Категории</router-link>
                 <div class="search-wrapper">
                     <input class="search-bar" type="text" placeholder="Поиск"/>
                     <button class="search-button">

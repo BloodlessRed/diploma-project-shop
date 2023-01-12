@@ -6,7 +6,7 @@ import Footer from "./views/Footer.vue";
 
 <template>
   <Header></Header>
-  <MainPage></MainPage>
+  <router-view :key="$route.fullPath"></router-view>
   <Footer></Footer>
 </template>
 
