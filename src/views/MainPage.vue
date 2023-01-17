@@ -17,7 +17,10 @@
     </div>
 </template>
 <script lang="ts" scoped>
-export default {
+import { defineComponent } from 'vue';
+import { RouterLink } from 'vue-router';
+
+export default defineComponent({
     data() {
         return {
             introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса',
@@ -37,13 +40,9 @@ export default {
             ]
         }
     }
-}
+})
 </script>
-<style>
-img {
-    max-width: fit-content;
-}
-
+<style scoped>
 .main-wrapper {
     height: 100%;
     display: flex;
@@ -54,6 +53,10 @@ img {
 
 .main-wrapper * {
     width: 100%;
+}
+
+img {
+    max-width: fit-content;
 }
 
 .introduction {

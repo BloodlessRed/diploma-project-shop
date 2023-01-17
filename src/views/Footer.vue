@@ -35,7 +35,9 @@
     </div>
 </template>
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
     data() {
         return {
             imgSrc: "logo.svg",
@@ -56,7 +58,7 @@ export default {
             console.log("Hello world!");
         }
     }
-}
+})
 </script>
 <style scoped>
 .footer-wrapper {

@@ -11,5 +11,6 @@ import Footer from "./views/Footer.vue";
 </template>
 
 <style>
+/* Global styles */
 
 </style>

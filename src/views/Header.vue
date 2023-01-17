@@ -51,7 +51,10 @@
     </div>
 </template>
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue';
+import { RouterLink } from 'vue-router';
+
+export default defineComponent({
     data() {
         return {
          
@@ -60,7 +63,7 @@ export default {
     methods: {
         
     }
-}
+})
 </script>
 <style scoped>
     button{
