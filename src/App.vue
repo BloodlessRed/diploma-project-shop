@@ -12,5 +12,16 @@ import Footer from "./views/Footer.vue";
 
 <style>
 /* Global styles */
+.item {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 20px 20px 20px;
+    padding: 10px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
 
 </style>

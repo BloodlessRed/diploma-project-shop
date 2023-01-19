@@ -6,7 +6,7 @@
         </div>
         <div class="category-block">
             <div class="category" v-for="category in categories">
-                <router-link :to="category.name">
+                <router-link :to="{name: 'Category', params:{category:category.name}}">
                     <p>
                         {{ category.name }}
                     </p>

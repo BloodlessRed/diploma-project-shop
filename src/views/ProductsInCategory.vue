@@ -4,7 +4,7 @@
             <div class="item" v-for="product in category">
                 <img :src="`./img/${product.img}`" />
                 <p>{{ product.name }}</p>
-                <router-link :to="product.prodLink">
+                <router-link :to="{name: 'Product', params: {category:categoryName, product:product.prodLink}}">
                     <div class="to-product-box">
                         <p> Read more </p>
                     </div>
@@ -22,7 +22,6 @@
                 </ul>
             </div>
         </div>
-        {{ categoryName }}
     </div>
 </template>
 <script lang="ts">
@@ -30,7 +29,8 @@ import { defineComponent } from 'vue'
 export default defineComponent({
     computed: {
         category(): { img: string; name: string; prodLink: string }[] {
-            let routeParameter: string = this.$route.params.categories.toString();
+            console.log(this.$route.params.category)
+            let routeParameter: string = this.$route.params.category.toString();
             if (routeParameter == "Nutrunners") {
                 return [
                     {
@@ -97,7 +97,7 @@ export default defineComponent({
         },
         categoryName(): string {
             console.log(this.$route.params);
-            return this.$route.params.categories.toString();
+            return this.$route.params.category.toString();
         }
     },
     data() {
@@ -123,17 +123,6 @@ export default defineComponent({
     flex: 1;
 }
 
-.item {
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 20px 20px 20px;
-    padding: 10px;
-    background: #FFFFFF;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-}
 
 .item img {
     height: auto;

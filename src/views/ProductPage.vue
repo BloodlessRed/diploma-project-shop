@@ -1,9 +1,27 @@
 <template >
     <div class="main-wrapper">
         <div class="product">
+            <div class="img-container">
 
+            </div>
+            <div class="product-info">
+                <h3></h3>
+                <p>Цена</p>
+                <p>Категория</p>
+                <p>Производитель</p>
+                <p></p><!-- В наличии или нет -->
+                <div class="button-section">
+                    <button>Добавить в корзину</button>
+                    <button>Получить взрыв-схему</button>
+                </div>
+            </div>
         </div>
         <h3 color="#0055D3">Похожие продукты</h3>
+        <div class="similar-products">
+            <div class="item">
+                
+            </div>
+        </div>
     </div>
 </template>
 <script lang="ts">
