@@ -4,7 +4,7 @@
             <div class="item" v-for="product in category">
                 <img :src="`./img/${product.img}`" />
                 <p>{{ product.name }}</p>
-                <router-link :to="{name: 'Product', params: {category:categoryName, product:product.prodLink}}">
+                <router-link :to="{name: 'Product', params: {category:categoryName, product:product.name}}">
                     <div class="to-product-box">
                         <p> Read more </p>
                     </div>

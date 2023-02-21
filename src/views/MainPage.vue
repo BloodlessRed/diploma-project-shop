@@ -5,11 +5,11 @@
             <p>{{ introduction }}</p>
         </div>
         <div class="category-block">
-            <div class="category" v-for="category in categories">
-                <router-link :to="{name: 'Category', params:{category:category.name}}">
-                    <p>
+            <div class="category" >
+                <router-link v-for="category in categories" :to="{name: 'Category', params:{category:category.name}}">
+                    <span>
                         {{ category.name }}
-                    </p>
+                    </span>
                     <img :src="`./img/${category.src}`">
                 </router-link>
             </div>
@@ -88,5 +88,14 @@ img {
 
 .category p {
     max-width: calc(10% + 5px);
+}
+.category a {
+    width: fit-content;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+span{
+    margin:0 10px;
 }
 </style>

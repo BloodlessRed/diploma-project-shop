@@ -88,12 +88,13 @@ flex-grow: 0;    }
     align-items: center;
 }
 .button-space{
-    width: 40%;
     display: flex;
     align-items: center;
     justify-content: space-around;
 }
+
 .button-space > a {
+    margin: 0 20px;
     font-family: 'Noto Sans';
 font-style: normal;
 font-weight: 400;
