@@ -5,13 +5,13 @@
                 <img src="" alt="">
             </div>
             <div class="product-info">
-                <h3>{{ productName }}</h3>
+                <h3>{{ cmptd_product_name }}</h3>
                 <p>Цена</p>
-                <p>Категория</p>
+                <p>Категория: {{ cmptd_product_category }}</p>
                 <p>Производитель</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
-                    <button>Добавить в корзину</button>
+                    <button @click="$emit('addToCart')">Добавить в корзину</button>
                     <button>Получить взрыв-схему</button>
                 </div>
             </div>
@@ -28,10 +28,33 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    computed:{
-        productName(): string{
-            return this.$route.params.product.toString();
+    emits:["addToCart"],
+    props:{
+        product:
+        {
+            type:String,
+            default:"no name selected"
+        },
+        category:{
+            type:String,
+            default:"no category"
         }
+    },
+    computed:{
+        cmptd_product_name(): string{
+            return this.product;
+        },
+        cmptd_product_category():string{
+            return this.category;
+        }
+    },
+    data(){
+        return{
+
+        }
+    },
+    methods:{
+
     }
 })
 </script>
@@ -42,5 +65,9 @@ export default defineComponent({
     flex-direction: column;
     /* justify-content: stretch; */
     padding: 220px
+}
+.product{
+    display: flex;
+    justify-content: center;
 }
 </style>

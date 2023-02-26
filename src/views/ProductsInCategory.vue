@@ -1,7 +1,7 @@
 <template>
     <div class="main-wrapper">
         <div class="products">
-            <div class="item" v-for="product in category">
+            <div class="item" v-for="product in cmptd_category">
                 <img :src="`./img/${product.img}`" />
                 <p>{{ product.name }}</p>
                 <router-link :to="{name: 'Product', params: {category:categoryName, product:product.name}}">
@@ -27,10 +27,16 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 export default defineComponent({
+    props:{
+        category: {
+            type: String,
+            default:"no category selected"
+        }
+    },
     computed: {
-        category(): { img: string; name: string; prodLink: string }[] {
-            console.log(this.$route.params.category)
-            let routeParameter: string = this.$route.params.category.toString();
+        cmptd_category(): { img: string; name: string; prodLink: string }[] {
+            console.log(this.category)
+            let routeParameter: string = this.category;
             if (routeParameter == "Nutrunners") {
                 return [
                     {
@@ -97,7 +103,7 @@ export default defineComponent({
         },
         categoryName(): string {
             console.log(this.$route.params);
-            return this.$route.params.category.toString();
+            return this.category;
         }
     },
     data() {

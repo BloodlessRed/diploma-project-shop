@@ -1,14 +1,30 @@
 <script setup lang="ts">
 import Header from "./views/Header.vue";
-import MainPage from "./views/MainPage.vue";
 import Footer from "./views/Footer.vue";
+import { defineComponent } from "vue";
 </script>
 
 <template>
-  <Header></Header>
-  <router-view :key="$route.fullPath"></router-view>
+  <Header :counter="prodCounter"></Header>
+  <router-view @addToCart="increaseAmount" :key="$route.fullPath"></router-view>
   <Footer></Footer>
 </template>
+
+<script lang="ts">
+export default defineComponent({
+  data(){
+    return{
+      prodCounter:0
+    }
+  },
+  methods:{
+    increaseAmount(){
+
+      this.prodCounter++
+    }
+  }
+})
+</script>
 
 <style>
 /* Global styles */
