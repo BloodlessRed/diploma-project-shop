@@ -5,13 +5,13 @@
                 <img src="" alt="">
             </div>
             <div class="product-info">
-                <h3>{{ cmptd_product_name }}</h3>
+                <h3>{{ product.name }}</h3>
                 <p>Цена</p>
                 <p>Категория: {{ cmptd_product_category }}</p>
                 <p>Производитель</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
-                    <button @click="$emit('addToCart', cmptd_product_name)">Добавить в корзину</button>
+                    <button @click="">Добавить в корзину</button>
                     <button>Получить взрыв-схему</button>
                 </div>
             </div>
@@ -26,14 +26,14 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {useCounterStore} from '@/stores/counter'
 
 export default defineComponent({
     emits:["addToCart"],
     props:{
-        product:
-        {
-            type:String,
-            default:"no name selected"
+        prod_id:{
+            type: Number,
+            default:-1
         },
         category:{
             type:String,
@@ -41,20 +41,29 @@ export default defineComponent({
         }
     },
     computed:{
-        cmptd_product_name(): string{
-            return this.product;
-        },
         cmptd_product_category():string{
             return this.category;
         }
     },
     data(){
         return{
-
+            product:{
+                id:-1,
+                name:"",
+                img:"",
+                prodLink:""
+            }
         }
     },
+    mounted() {
+        fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.prod_id)
+                .then(res=>{return res.json()})
+                .then(data=>{console.log(data); this.product = data})
+    },
     methods:{
-
+        addToShoppingCart(){
+            
+        }
     }
 })
 </script>

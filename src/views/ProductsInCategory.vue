@@ -3,8 +3,8 @@
         <div class="products">
             <div class="item" v-for="product in cmptd_category">
                 <img :src="`./img/${product.img}`" />
-                <p>{{ product.name }}</p>
-                <router-link :to="{name: 'Product', params: {category:categoryName, product:product.name}}">
+                <p>{{product.name }}</p>
+                <router-link :to="{name: 'Product', params: {category:categoryName, product_name:product.name, prod_id:product.id}}">
                     <div class="to-product-box">
                         <p> Read more </p>
                     </div>
@@ -34,72 +34,36 @@ export default defineComponent({
         }
     },
     computed: {
-        cmptd_category(): { img: string; name: string; prodLink: string }[] {
+        cmptd_category(): any[] {
             console.log(this.category)
             let routeParameter: string = this.category;
+            let products: any = []
             if (routeParameter == "Nutrunners") {
-                return [
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    },
-                    {
-                        img: "cable-pic-proto.svg",
-                        name: "Atlas Copco 4220-0982-15 15 meter Cable",
-                        prodLink: "STUB"
-                    }
-                ]
+                console.log(this.products)
+                return this.products
             } else if (routeParameter == "SecondaryMarket") {
                 return [
                     {
+                        id:1,
                         img: "cable-pic-proto.svg",
                         name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
                         prodLink: "STUB"
                     },
                     {
+                        id:2,
                         img: "cable-pic-proto.svg",
                         name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
                         prodLink: "STUB"
                     },
                     {
+                        id:3,
                         img: "cable-pic-proto.svg",
                         name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
                         prodLink: "STUB"
                     }
                 ]
             }
-            return [{ img: "null", name: "null", prodLink: "null" }];
+            return [{id:0, img: "null", name: "null", prodLink: "null" }];
         },
         categoryName(): string {
             console.log(this.$route.params);
@@ -108,8 +72,14 @@ export default defineComponent({
     },
     data() {
         return {
-
+            products: []
         }
+    },
+    mounted() {
+        fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1))
+                .then(res=>{return res.json()})
+                .then(data=>{console.log(data); this.products = data})
+                
     }
 
 })
