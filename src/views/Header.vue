@@ -161,9 +161,9 @@ line-height: 19px;
 
 color: #FFFFFF;
 position: absolute;
-left: 94.84%;
+/* left: 94.84%;
 right: 4.69%;
 top: 31.11%;
-bottom: 56.11%;
+bottom: 56.11%; */
 }
 </style>

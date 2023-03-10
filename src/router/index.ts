@@ -13,7 +13,7 @@ const router = createRouter({
       component: MainPage
     },
     {
-      path:"/:category*", 
+      path:"/:category", 
       name:"Category", 
       component: ProductsInCategory, 
       props:true

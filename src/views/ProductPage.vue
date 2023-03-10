@@ -11,7 +11,7 @@
                 <p>Производитель</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
-                    <button @click="$emit('addToCart')">Добавить в корзину</button>
+                    <button @click="$emit('addToCart', cmptd_product_name)">Добавить в корзину</button>
                     <button>Получить взрыв-схему</button>
                 </div>
             </div>

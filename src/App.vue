@@ -18,8 +18,9 @@ export default defineComponent({
     }
   },
   methods:{
-    increaseAmount(){
-
+    increaseAmount(product_name:string){
+      console.log(product_name)
+      console.log("event emmited")
       this.prodCounter++
     }
   }
