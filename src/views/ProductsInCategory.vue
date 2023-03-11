@@ -4,7 +4,7 @@
             <div class="item" v-for="product in cmptd_category">
                 <img :src="`./img/${product.img}`" />
                 <p>{{product.name }}</p>
-                <router-link :to="{name: 'Product', params: {category:categoryName, product_name:product.name, prod_id:product.id}}">
+                <router-link :to="{name: 'Product', params: {category:categoryName, product_id:product.id}}">
                     <div class="to-product-box">
                         <p> Read more </p>
                     </div>

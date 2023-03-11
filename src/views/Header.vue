@@ -46,25 +46,21 @@
     </div>
 </template>
 <script lang="ts">
+import { useShoppingCartStore } from '@/stores/shoppingCart';
 import { defineComponent } from 'vue';
 import { RouterLink } from 'vue-router';
 
 export default defineComponent({
-    props:{
-        counter:{
-            type:Number,
-            default:0
-        }
-    },
     computed:{
         cmptd_counter():number{
-            console.log(this.counter)
-            return this.counter;
+            return this.shoppingCart.counter
         }
     },
     data() {
         return {
-            test: this.customProductsInCart
+            test: this.customProductsInCart,
+            shoppingCart: useShoppingCartStore()
+    
         }
     },
     methods: {

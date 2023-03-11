@@ -2,7 +2,7 @@
     <div class="main-wrapper">
         <div class="product">
             <div class="img-container">
-                <img src="" alt="">
+                <img :src="`../img/${product.img}`" alt="">
             </div>
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
@@ -11,7 +11,7 @@
                 <p>Производитель</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
-                    <button @click="">Добавить в корзину</button>
+                    <button @click="addToShoppingCart()">Добавить в корзину</button>
                     <button>Получить взрыв-схему</button>
                 </div>
             </div>
@@ -26,13 +26,12 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import {useCounterStore} from '@/stores/counter'
-
+import { Product } from '@/model/Product';
+import { useShoppingCartStore } from '@/stores/shoppingCart'
 export default defineComponent({
-    emits:["addToCart"],
     props:{
-        prod_id:{
-            type: Number,
+        product_id:{
+            type: String,
             default:-1
         },
         category:{
@@ -47,22 +46,19 @@ export default defineComponent({
     },
     data(){
         return{
-            product:{
-                id:-1,
-                name:"",
-                img:"",
-                prodLink:""
-            }
+            product: new Product(),
+            shoppingCart: useShoppingCartStore()
         }
     },
     mounted() {
-        fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.prod_id)
-                .then(res=>{return res.json()})
+        fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.product_id)
+                .then(res=>{return res.json() as Promise<Product>})
                 .then(data=>{console.log(data); this.product = data})
     },
     methods:{
         addToShoppingCart(){
-            
+            console.log(this.product)
+          this.shoppingCart.addToCart(this.product)
         }
     }
 })

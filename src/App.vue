@@ -5,8 +5,8 @@ import { defineComponent } from "vue";
 </script>
 
 <template>
-  <Header :counter="prodCounter"></Header>
-  <router-view @addToCart="increaseAmount" :key="$route.fullPath"></router-view>
+  <Header></Header>
+  <router-view :key="$route.fullPath"></router-view>
   <Footer></Footer>
 </template>
 
@@ -14,14 +14,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   data(){
     return{
-      prodCounter:0
-    }
-  },
-  methods:{
-    increaseAmount(product_name:string){
-      console.log(product_name)
-      console.log("event emmited")
-      this.prodCounter++
+
     }
   }
 })

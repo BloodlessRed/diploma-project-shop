@@ -16,5 +16,10 @@ export class Product{
                 this.prodLink = "";           
             }
         }
+        
+        equals(o:Product):boolean{
+            return o.name == this.name
+            && o.prodLink == this.prodLink;
+        }
     
 }
