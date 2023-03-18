@@ -5,10 +5,10 @@
                 <img :src="`../img/${product.img}`" alt="">
             </div>
             <div class="product-info">
-                <h3>{{ product.name }}</h3>
-                <p>Цена</p>
+                <h1>{{ product.name }}</h1>
+                <p>Цена:</p>
                 <p>Категория: {{ cmptd_product_category }}</p>
-                <p>Производитель</p>
+                <p>Производитель:</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
                     <button @click="addToShoppingCart()">Добавить в корзину</button>
@@ -51,7 +51,7 @@ export default defineComponent({
         }
     },
     mounted() {
-        fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.product_id)
+        fetch( "https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.product_id)
                 .then(res=>{return res.json() as Promise<Product>})
                 .then(data=>{console.log(data); this.product = data})
     },
@@ -74,5 +74,17 @@ export default defineComponent({
 .product{
     display: flex;
     justify-content: center;
+}
+.product-info > p{
+    font-size: 17px;
+    line-height: 1.3;
+}
+.img-container{
+    height: 80%;
+    width: 50%;
+}
+.img-container > img{
+    height: 100%;
+    width: 100%;
 }
 </style>

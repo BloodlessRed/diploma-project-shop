@@ -27,7 +27,7 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
                     alert("Item was not added to the cart. Please, try again!")
                 }
             }else{
-                this.cart.set(item.id,new ShoppingCartProduct(item,1))
+                this.cart.set(this.cart.size,new ShoppingCartProduct(item,1))
             }
         },
         removeFromCart(item: Product){
