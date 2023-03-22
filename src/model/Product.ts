@@ -1,25 +1,27 @@
 export class Product{
         id:number;
-        name: string;
+        vendorCode: string;
+        name:string
+        price:number
         img:string;
-        prodLink:string;
-        constructor(id?:number, name?:string, img?:string, prodLink?:string){
-            if(id && name && img && prodLink){
+        constructor(id?:number, vendorCode?:string, price?:number, name?:string, img?:string, prodLink?:string){
+            if(id && vendorCode && price && name && img && prodLink){
                 this.id = id;
+                this.vendorCode = vendorCode;
+                this.price = price
                 this.name = name;
-                this.img = img;
-                this.prodLink = prodLink            
+                this.img = img;         
             }else{
                 this.id = -1;
+                this.vendorCode = ""
+                this.price = -1
                 this.name = "";
-                this.img = "";
-                this.prodLink = "";           
+                this.img = "";       
             }
         }
         
         equals(o:Product):boolean{
-            return o.name == this.name
-            && o.prodLink == this.prodLink;
+            return o.vendorCode == this.vendorCode
         }
     
 }

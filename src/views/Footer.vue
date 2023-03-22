@@ -2,7 +2,7 @@
     <div class="footer-wrapper">
         <div class="footer-main-content">
             <div class="logo">
-                <img :src="`./img/${imgSrc}`" />
+                <img :src="`./img/logo.svg`" />
             </div>
             <div class="site-content">
                 <p>Поставщики</p>
@@ -72,7 +72,7 @@ export default defineComponent({
 .footer-main-content {
     display: flex;
     justify-content: space-evenly;
-    padding: 0 12%;
+    padding: 10px 12%;
 }
 
 .logo {

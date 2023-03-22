@@ -12,14 +12,14 @@
       <tr v-for="itemId in shoppingCart.cart.size">
         <td>
           <img
-            :src="`../img/${shoppingCart.cart.get(itemId - 1)?.product.img}`"
+            :src="`../img/${getProductFromCart(itemId).product.img}-Nutrunners.svg`"
           />
         </td>
-        <td>{{ shoppingCart.cart.get(itemId - 1)?.product.name }}</td>
-        <td>{{ shoppingCart.cart.get(itemId - 1)?.product.id }}</td>
-        <td>{{ "PRICE" }}</td>
-        <td>{{ shoppingCart.cart.get(itemId - 1)?.amount }}</td>
-        <td>{{ "SUM" }}</td>
+        <td>{{ getProductFromCart(itemId).product.name }}</td>
+        <td>{{ getProductFromCart(itemId).product.vendorCode }}</td>
+        <td>{{ getProductFromCart(itemId).product.price }}</td>
+        <td>{{ getProductFromCart(itemId).amount }}</td>
+        <td>{{ getProductFromCart(itemId).amount * getProductFromCart(itemId).product.price  }}</td>
       </tr>
     </table>
     <div class="client-info">
@@ -49,7 +49,6 @@
             <div
               class="person_line person_type_input person_company none"
               data-optbody="2"
-              style="display: block"
             >
               <div class="input-field-standart input-oneline">
                 <label class="field-title"
@@ -70,7 +69,6 @@
             <div
               class="person_line person_type_input person_inn none"
               data-optbody="2"
-              style="display: block"
             >
               <div class="input-field-standart input-oneline">
                 <label class="field-title"
@@ -212,6 +210,7 @@
   </div>
 </template>
 <script lang="ts">
+import { ShoppingCartProduct } from "@/model/ShoppingCartProduct";
 import { useShoppingCartStore } from "@/stores/shoppingCart";
 import { defineComponent } from "vue";
 
@@ -221,12 +220,25 @@ export default defineComponent({
       shoppingCart: useShoppingCartStore(),
     };
   },
+  methods:{
+    getProductFromCart(id:number):ShoppingCartProduct{
+      let prod = this.shoppingCart.cart.get(id-1)
+       if(prod){
+        return prod
+       } else{
+        return new ShoppingCartProduct()
+       }
+    }
+  },
   mounted() {
     console.log(this.shoppingCart.cart);
   },
 });
 </script>
 <style scoped>
+td > img{
+  width: 150px;
+}
 .cart-main-content {
   display: flex;
   flex-direction: column;

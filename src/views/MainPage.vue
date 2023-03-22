@@ -8,7 +8,7 @@
             <div class="category" >
                 <router-link v-for="category in categories" :to="{name: 'Category', params:{category:category.name}}">
                     <span>
-                        {{ category.name }}
+                        {{ category.name.charAt(0).toUpperCase() + category.name.slice(1) }}
                     </span>
                     <img :src="`./img/${category.src}`">
                 </router-link>
@@ -26,15 +26,11 @@ export default defineComponent({
             introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса',
             categories: [
                 {
-                    name: "Nutrunners",
+                    name: "nutrunners",
                     src: "category1.svg"
                 },
                 {
                     name: "SecondaryMarket",
-                    src: "category1.svg"
-                },
-                {
-                    name: "category3",
                     src: "category1.svg"
                 }
             ]

@@ -3,7 +3,7 @@
     {
       "id": 0,
       "img": "cable-pic-proto.svg",
-      "name": "Atlas Copco 4220-0982-15 15 meter Cable",
+      "name": "Atlas Copco 4220-0982-15 10 meter Cable",
       "prodLink": "STUB"
     },
     {
@@ -42,5 +42,8 @@
       "name": "Atlas Copco 4220-0982-15 15 meter Cable",
       "prodLink": "STUB"
     }
+  ],
+  "articles":[
+
   ]
 }

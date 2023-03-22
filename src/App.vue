@@ -23,9 +23,10 @@ export default defineComponent({
 <style>
 /* Global styles */
 .item {
-    height: fit-content;
+    width: min-content;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     margin: 0 20px 20px 20px;
     padding: 10px;

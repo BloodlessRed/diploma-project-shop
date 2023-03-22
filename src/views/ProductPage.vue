@@ -2,11 +2,11 @@
     <div class="main-wrapper">
         <div class="product">
             <div class="img-container">
-                <img :src="`../img/${product.img}`" alt="">
+                <img :src="`../img/${product.img}-Nutrunners.svg`" alt="">
             </div>
             <div class="product-info">
                 <h1>{{ product.name }}</h1>
-                <p>Цена:</p>
+                <p>Цена: {{ product.price }}</p>
                 <p>Категория: {{ cmptd_product_category }}</p>
                 <p>Производитель:</p>
                 <p></p><!-- В наличии или нет -->
@@ -18,8 +18,19 @@
         </div>
         <h3 color="#0055D3">Похожие продукты</h3>
         <div class="similar-products">
-            <div class="item">
-
+            <div class="item" v-for="item in similarProducts">
+                <img :src="`../img/${item.img}-Nutrunners.svg`" />
+        <p>{{ item.name }}</p>
+        <router-link
+          :to="{
+            name: 'Product',
+            params: { category: cmptd_product_category, product_id: item.id },
+          }"
+        >
+          <div class="to-product-box">
+            <p>Read more</p>
+          </div>
+        </router-link>
             </div>
         </div>
     </div>
@@ -28,6 +39,7 @@
 import { defineComponent } from 'vue';
 import { Product } from '@/model/Product';
 import { useShoppingCartStore } from '@/stores/shoppingCart'
+import axios from 'axios';
 export default defineComponent({
     props:{
         product_id:{
@@ -47,13 +59,20 @@ export default defineComponent({
     data(){
         return{
             product: new Product(),
+            similarProducts: [] as Product[],
             shoppingCart: useShoppingCartStore()
         }
     },
     mounted() {
-        fetch( "https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/"+this.category.charAt(0).toLowerCase() + this.category.slice(1)+"/"+this.product_id)
-                .then(res=>{return res.json() as Promise<Product>})
-                .then(data=>{console.log(data); this.product = data})
+        let url:string = "https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/"+this.category+"/"+this.product_id 
+        axios.get(url)
+                .then(res=>{return res.data as Promise<Product>})
+                .then(data=>{console.log(data); this.product = data;}) 
+                .then(()=>{ url = "https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/"+this.category.toString()+"/?vendorCode_like="+this.product.img
+        axios.get(url)
+        .then(res=>{return res.data as Promise<Product[]>})
+        .then(data=>{console.log(data,); this.similarProducts = data})    
+        })       
     },
     methods:{
         addToShoppingCart(){
@@ -65,7 +84,6 @@ export default defineComponent({
 </script>
 <style scoped>
 .main-wrapper {
-    height: 100%;
     display: flex;
     flex-direction: column;
     /* justify-content: stretch; */
@@ -74,17 +92,27 @@ export default defineComponent({
 .product{
     display: flex;
     justify-content: center;
+    align-self: center;
+}
+.product-info {
+    width: 50%;
+    margin-bottom: 5%;
 }
 .product-info > p{
     font-size: 17px;
     line-height: 1.3;
 }
+.item > img{
+    width: 200px;
+}
 .img-container{
-    height: 80%;
-    width: 50%;
+    margin: 0 50px;
 }
 .img-container > img{
-    height: 100%;
-    width: 100%;
+    height: 250px;
+    width: 250px;
+}
+.similar-products{
+    display: flex;
 }
 </style>

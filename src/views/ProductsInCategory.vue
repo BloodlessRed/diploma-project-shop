@@ -2,7 +2,7 @@
   <div class="main-wrapper">
     <div class="products">
       <div class="item" v-for="product in cmptd_category">
-        <img :src="`./img/${product.img}`" />
+        <img :src="`./img/${product.img}-Nutrunners.svg`" />
         <p>{{ product.name }}</p>
         <router-link
           :to="{
@@ -31,6 +31,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
+import axios from 'axios'
 export default defineComponent({
   props: {
     category: {
@@ -43,7 +44,7 @@ export default defineComponent({
       console.log(this.category);
       let routeParameter: string = this.category;
       let products: any = [];
-      if (routeParameter == "Nutrunners") {
+      if (routeParameter == "nutrunners") {
         console.log(this.products);
         return this.products;
       } else if (routeParameter == "SecondaryMarket") {
@@ -81,28 +82,15 @@ export default defineComponent({
     };
   },
   mounted() {
-    // fetch("http://localhost:3000/"+this.category.charAt(0).toLowerCase() + this.category.slice(1))
-    //         .then(res=>{return res.json()})
-    //         .then(data=>{console.log(data); this.products = data})
-    
-    fetch(
-      "https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/" +
-        this.category.charAt(0).toLowerCase() +
-        this.category.slice(1)
-    )
+    axios.get("https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/" +this.category)
       .then((res) => {
-        return res.json();
+        this.products = res.data;
       })
-      .then((data) => {
-        console.log(data);
-        this.products = data;
-      });
   },
 });
 </script>
 <style scoped>
 .main-wrapper {
-  height: 100%;
   display: flex;
   /* justify-content: stretch; */
   padding: 50px 220px;
@@ -112,12 +100,11 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
-  flex: 1;
 }
 
 .item img {
-  height: auto;
-  width: auto;
+  height: 300px;
+  width: 300px;
 }
 
 .item p {
