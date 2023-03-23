@@ -12,14 +12,21 @@
       <tr v-for="itemId in shoppingCart.cart.size">
         <td>
           <img
-            :src="`../img/${getProductFromCart(itemId).product.img}-Nutrunners.svg`"
+            :src="`../img/${
+              getProductFromCart(itemId).product.img
+            }-Nutrunners.svg`"
           />
         </td>
         <td>{{ getProductFromCart(itemId).product.name }}</td>
         <td>{{ getProductFromCart(itemId).product.vendorCode }}</td>
         <td>{{ getProductFromCart(itemId).product.price }}</td>
         <td>{{ getProductFromCart(itemId).amount }}</td>
-        <td>{{ getProductFromCart(itemId).amount * getProductFromCart(itemId).product.price  }}</td>
+        <td>
+          {{
+            getProductFromCart(itemId).amount *
+            getProductFromCart(itemId).product.price
+          }}
+        </td>
       </tr>
     </table>
     <div class="client-info">
@@ -207,11 +214,17 @@
         </div>
       </div>
     </div>
+    <button @click="generateCommercialOffer()">
+      Получить коммерческое предложение
+    </button>
   </div>
 </template>
 <script lang="ts">
 import { ShoppingCartProduct } from "@/model/ShoppingCartProduct";
 import { useShoppingCartStore } from "@/stores/shoppingCart";
+import axios from "axios";
+import {SignJWT as signingTool} from 'jose'
+import base64 from "b64ux"
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -220,15 +233,66 @@ export default defineComponent({
       shoppingCart: useShoppingCartStore(),
     };
   },
-  methods:{
-    getProductFromCart(id:number):ShoppingCartProduct{
-      let prod = this.shoppingCart.cart.get(id-1)
-       if(prod){
-        return prod
-       } else{
-        return new ShoppingCartProduct()
-       }
-    }
+  methods: {
+    getProductFromCart(id: number): ShoppingCartProduct {
+      let prod = this.shoppingCart.cart.get(id - 1);
+      if (prod) {
+        return prod;
+      } else {
+        return new ShoppingCartProduct();
+      }
+    },
+    async generateCommercialOffer() {
+      let bearer;
+      let origHeader = {
+        alg: "HS256",
+        typ: "JWT",
+      };
+      let origPlaceholder = {
+        iss: "2f54bb29282370c33a91a939266213ec83ab13cc88dcb2507307db83cc4e6719",
+        sub: "mms28042001@gmail.com",
+        exp: new Date(Date.now() + 10000).getTime(),
+      };
+      let API_SECRET_CODE =
+        "19b3212fa4c0a6c7c930285bf8bf7f363bbbe0689597f7c6a605a0d8bd085e11";
+        let JWT = await new signingTool(origPlaceholder)
+        .setProtectedHeader({alg:'HS256'})
+        .setExpirationTime('1h')
+        .sign(new TextEncoder().encode(API_SECRET_CODE)).then(value=>{bearer = value})
+      //let bearerCode =
+      //base64.encode(JSON.stringify(origHeader))+"."+base64.encode(JSON.stringify(origPlaceholder))+"."+base64.encode(API_SECRET_CODE)
+      //btoa(JSON.stringify(origHeader)) + "." + btoa(JSON.stringify(origPlaceholder))+"."+API_SECRET_CODE
+       // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjU0YmIyOTI4MjM3MGMzM2E5MWE5MzkyNjYyMTNlYzgzYWIxM2NjODhkY2IyNTA3MzA3ZGI4M2NjNGU2NzE5Iiwic3ViIjoibW1zMjgwNDIwMDFAZ21haWwuY29tIiwiZXhwIjoxNjc5NTU3NTg4MzQ2fQ.B0dQD-LV1aXHg8YCfanHCC52fBm5icIIHpobLD-9VFA";
+      console.log(bearer);
+      axios
+        .post(
+          "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
+          {
+            template: {
+              id: "614636",
+              data: {
+                docId: "001",
+                currentDate: new Date(),
+              },
+            },
+            format: "pdf",
+            output: "url",
+            name: "Invoice 123",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + bearer,
+              // alg:"HS256",
+              // typ:"JWT",
+              // iss:"2f54bb29282370c33a91a939266213ec83ab13cc88dcb2507307db83cc4e6719",
+              // sub:"mms28042001@gmail.com",
+              // exp: 1586112639
+            },
+          }
+        )
+        .then((res) => console.log(res));
+    },
   },
   mounted() {
     console.log(this.shoppingCart.cart);
@@ -236,7 +300,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-td > img{
+td > img {
   width: 150px;
 }
 .cart-main-content {
@@ -247,8 +311,13 @@ td > img{
   width: 70%;
   align-self: center;
 }
-.cart-items th, td {
+.cart-items th,
+td {
   width: fit-content;
   text-align: center;
+}
+.client-info {
+  display: flex;
+  flex-direction: column;
 }
 </style>
