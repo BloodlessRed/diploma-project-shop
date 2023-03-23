@@ -223,8 +223,7 @@
 import { ShoppingCartProduct } from "@/model/ShoppingCartProduct";
 import { useShoppingCartStore } from "@/stores/shoppingCart";
 import axios from "axios";
-import {SignJWT as signingTool} from 'jose'
-import base64 from "b64ux"
+import { SignJWT as signingTool } from "jose";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -255,16 +254,19 @@ export default defineComponent({
       };
       let API_SECRET_CODE =
         "19b3212fa4c0a6c7c930285bf8bf7f363bbbe0689597f7c6a605a0d8bd085e11";
-        let JWT = await new signingTool(origPlaceholder)
-        .setProtectedHeader({alg:'HS256'})
-        .setExpirationTime('1h')
-        .sign(new TextEncoder().encode(API_SECRET_CODE)).then(value=>{bearer = value})
+      let JWT = await new signingTool(origPlaceholder)
+        .setProtectedHeader({ alg: "HS256" })
+        .setExpirationTime("1h")
+        .sign(new TextEncoder().encode(API_SECRET_CODE))
+        .then((value) => {
+          bearer = value;
+        });
       //let bearerCode =
       //base64.encode(JSON.stringify(origHeader))+"."+base64.encode(JSON.stringify(origPlaceholder))+"."+base64.encode(API_SECRET_CODE)
       //btoa(JSON.stringify(origHeader)) + "." + btoa(JSON.stringify(origPlaceholder))+"."+API_SECRET_CODE
-       // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjU0YmIyOTI4MjM3MGMzM2E5MWE5MzkyNjYyMTNlYzgzYWIxM2NjODhkY2IyNTA3MzA3ZGI4M2NjNGU2NzE5Iiwic3ViIjoibW1zMjgwNDIwMDFAZ21haWwuY29tIiwiZXhwIjoxNjc5NTU3NTg4MzQ2fQ.B0dQD-LV1aXHg8YCfanHCC52fBm5icIIHpobLD-9VFA";
+      // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjU0YmIyOTI4MjM3MGMzM2E5MWE5MzkyNjYyMTNlYzgzYWIxM2NjODhkY2IyNTA3MzA3ZGI4M2NjNGU2NzE5Iiwic3ViIjoibW1zMjgwNDIwMDFAZ21haWwuY29tIiwiZXhwIjoxNjc5NTU3NTg4MzQ2fQ.B0dQD-LV1aXHg8YCfanHCC52fBm5icIIHpobLD-9VFA";
       console.log(bearer);
-      axios
+      await axios
         .post(
           "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
           {
@@ -291,7 +293,23 @@ export default defineComponent({
             },
           }
         )
-        .then((res) => console.log(res));
+        .then((res) => {
+          return res.data;
+        })
+        .then((data) => {
+          axios
+            .get(data.response, { responseType: "blob" })
+            .then((response) => {
+              const blob = new Blob([response.data], {
+                type: "application/pdf",
+              });
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              link.download = "Invoice 123";
+              link.click();
+              URL.revokeObjectURL(link.href);
+            });
+        });
     },
   },
   mounted() {
