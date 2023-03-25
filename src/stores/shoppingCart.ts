@@ -1,6 +1,7 @@
-import { defineStore } from "pinia";
+import { defineStore, type StateTree } from "pinia";
 import type { Product } from '@/model/Product';
 import { ShoppingCartProduct } from "@/model/ShoppingCartProduct";
+import {parse, stringify} from 'zipson'
 
 export const useShoppingCartStore = defineStore('shoppingCart',{
     state:()=>{
@@ -11,8 +12,12 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
     getters:{
         counter: (state) => {
             let counter = 0
+            console.log("counter",state.cart)
             state.cart.forEach((value,key)=>{counter = counter + value.amount})
             return counter
+        },
+        entries:(state)=>{
+            return state.cart.entries()
         }
     },
     actions:{
@@ -48,6 +53,7 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
         findItemInCart(item:Product):number | undefined{
             console.log("Item passed is:", item)
             let id = undefined
+            console.log("this.cart equals",this.cart)
             this.cart.forEach((value,key)=>{
                 console.log(value.product)
                 if (item.id == value.product.id){
@@ -55,6 +61,45 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
                 }
             })
             return id;
+        }
+    },
+    persist:{
+        storage:sessionStorage,
+        paths:["cart"],
+        afterRestore(context) {
+            console.log("After restoration ",context)
+        },
+        serializer:{
+           serialize:(value)=> {
+            console.log("StateTree example", value)
+                let customMap:[{id:number, customProduct:{product:Product,amount:number}}] = []
+                value.cart.forEach((value:ShoppingCartProduct,key:number) => {
+                    customMap.push({
+                        id:key,
+                        customProduct:{
+                            product:value.product,
+                            amount:value.amount
+                        }
+                    })
+                });
+               console.log("serealizing cart", customMap)
+               return stringify(customMap)
+           },
+           deserialize:(value)=> {
+                let newStateTree: StateTree = {
+                    cart: new Map<number,ShoppingCartProduct>
+                };
+               let deserializedMap = new Map<number,ShoppingCartProduct>()
+               let parsedString = []
+               parsedString = parse(value)
+               parsedString.forEach(element => {
+                let tempShoppingCartProduct:ShoppingCartProduct = new ShoppingCartProduct(element.customProduct.product,element.customProduct.amount)
+                deserializedMap.set(element.id, tempShoppingCartProduct)
+               });
+               newStateTree.cart = deserializedMap
+               console.log(deserializedMap)
+               return newStateTree
+           },
         }
     }
 })

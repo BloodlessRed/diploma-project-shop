@@ -1,14 +1,14 @@
 <template>
   <div class="cart-main-content">
     <table class="cart-items">
-      <tr>
-        <th>Фото</th>
-        <th>Название</th>
-        <th>Артикул</th>
-        <th>Цена</th>
-        <th>Кол-во</th>
-        <th>Сумма</th>
-      </tr>
+        <tr>
+          <th>Фото</th>
+          <th>Название</th>
+          <th>Артикул</th>
+          <th>Цена</th>
+          <th>Кол-во</th>
+          <th>Сумма</th>
+        </tr>
       <tr v-for="itemId in shoppingCart.cart.size">
         <td>
           <img
@@ -279,17 +279,12 @@ export default defineComponent({
             },
             format: "pdf",
             output: "url",
-            name: "Invoice 123",
+            name: "Invoice_Newton_M",
           },
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: "Bearer " + bearer,
-              // alg:"HS256",
-              // typ:"JWT",
-              // iss:"2f54bb29282370c33a91a939266213ec83ab13cc88dcb2507307db83cc4e6719",
-              // sub:"mms28042001@gmail.com",
-              // exp: 1586112639
             },
           }
         )
@@ -305,7 +300,7 @@ export default defineComponent({
               });
               const link = document.createElement("a");
               link.href = URL.createObjectURL(blob);
-              link.download = "Invoice 123";
+              link.download = "Invoice_Newton_M";
               link.click();
               URL.revokeObjectURL(link.href);
             });
@@ -325,7 +320,12 @@ td > img {
   display: flex;
   flex-direction: column;
 }
+.cart-items > tr:first-of-type{
+  background: rgba(255,255,255,0.03);
+    border-bottom: solid black
+  }
 .cart-items {
+  border: 1px solid rgba(0, 0, 0, 0.1);
   width: 70%;
   align-self: center;
 }
