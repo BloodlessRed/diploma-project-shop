@@ -72,7 +72,7 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
         serializer:{
            serialize:(value)=> {
             console.log("StateTree example", value)
-                let customMap:[{id:number, customProduct:{product:Product,amount:number}}] = []
+                let customMap:unknown[] = []
                 value.cart.forEach((value:ShoppingCartProduct,key:number) => {
                     customMap.push({
                         id:key,
@@ -92,7 +92,7 @@ export const useShoppingCartStore = defineStore('shoppingCart',{
                let deserializedMap = new Map<number,ShoppingCartProduct>()
                let parsedString = []
                parsedString = parse(value)
-               parsedString.forEach(element => {
+               parsedString.forEach((element:any) => {
                 let tempShoppingCartProduct:ShoppingCartProduct = new ShoppingCartProduct(element.customProduct.product,element.customProduct.amount)
                 deserializedMap.set(element.id, tempShoppingCartProduct)
                });
