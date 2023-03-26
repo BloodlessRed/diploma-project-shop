@@ -6,6 +6,7 @@ import router from './router'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import './assets/main.css'
+window.sessionStorage.clear
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)

@@ -5,9 +5,10 @@
                 <img :src="`../img/${product.img}-Nutrunners.svg`" alt="">
             </div>
             <div class="product-info">
-                <h1>{{ product.name }}</h1>
+                <h1>{{ product.vendorCode }}</h1>
+                <p>Описание: {{ product.name }}</p>
                 <p>Цена: {{ product.price }}</p>
-                <p>Категория: {{ cmptd_product_category }}</p>
+                <p>Категория: <router-link :to="{name: 'Category', params:{category:cmptd_product_category}}">{{ cmptd_product_category }}</router-link></p>
                 <p>Производитель:</p>
                 <p></p><!-- В наличии или нет -->
                 <div class="button-section">
