@@ -87,8 +87,8 @@
             >ФИО <span class="mandatory-asterisk">*</span></label
           >
           <input
+            v-model="fullName"
             name="customf[name][value]"
-            value=""
             maxlength="255"
             size="50"
             data-oneline=""
@@ -207,6 +207,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   data() {
     return {
+      fullName:"",
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
@@ -241,9 +242,14 @@ export default defineComponent({
         .then((value) => {
           bearer = value;
         });
+      let dateForCO = new Date(Date.now())
+      let expirationDate = new Date(dateForCO)
+      expirationDate.setMonth(expirationDate.getMonth()+1)
       let preparedData = {
         docId: "001",
-        currentDate: new Date(Date.now()).toLocaleString().split(",")[0],
+        currentDate: dateForCO.toLocaleString().split(",")[0],
+        expirationDate: expirationDate.toLocaleString().split(",")[0],
+        fullName:this.fullName,
         products: this.productsForCO,
       };
       console.log(preparedData);
@@ -298,7 +304,7 @@ export default defineComponent({
         vendorCode: value.product.vendorCode,
         name: value.product.name,
         price: value.product.price,
-        sum: value.product.price * value.amount,
+        productSum: value.product.price * value.amount,
         photo: "stub",
       });
       axios
