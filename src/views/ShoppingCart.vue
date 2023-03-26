@@ -209,7 +209,7 @@ export default defineComponent({
     return {
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
-      base64Images: new Map<number,string>()
+      base64Images: new Map<number, string>(),
     };
   },
   methods: {
@@ -222,13 +222,6 @@ export default defineComponent({
       }
     },
     async generateCommercialOffer() {
-      // this.productsForCO.forEach((value)=>{
-        
-      //   value.photo = this.base64Images.get(value.prod_id)
-      //   console.log("looped id",value.photo)
-        
-      // })
-      // console.log(this.productsForCO)
       let bearer;
       let origHeader = {
         alg: "HS256",
@@ -248,13 +241,9 @@ export default defineComponent({
         .then((value) => {
           bearer = value;
         });
-      //let bearerCode =
-      //base64.encode(JSON.stringify(origHeader))+"."+base64.encode(JSON.stringify(origPlaceholder))+"."+base64.encode(API_SECRET_CODE)
-      //btoa(JSON.stringify(origHeader)) + "." + btoa(JSON.stringify(origPlaceholder))+"."+API_SECRET_CODE
-      // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjU0YmIyOTI4MjM3MGMzM2E5MWE5MzkyNjYyMTNlYzgzYWIxM2NjODhkY2IyNTA3MzA3ZGI4M2NjNGU2NzE5Iiwic3ViIjoibW1zMjgwNDIwMDFAZ21haWwuY29tIiwiZXhwIjoxNjc5NTU3NTg4MzQ2fQ.B0dQD-LV1aXHg8YCfanHCC52fBm5icIIHpobLD-9VFA";
       let preparedData = {
         docId: "001",
-        currentDate: new Date(Date.now()).toLocaleString().split(',')[0],
+        currentDate: new Date(Date.now()).toLocaleString().split(",")[0],
         products: this.productsForCO,
       };
       console.log(preparedData);
@@ -304,35 +293,49 @@ export default defineComponent({
     let imgBase64;
     this.shoppingCart.cart.forEach((value, key) => {
       products.push({
-            prod_id: key,
-            amount: value.amount,
-            vendorCode: value.product.vendorCode,
-            name: value.product.name,
-            price: value.product.price,
-            sum: value.product.price * value.amount,
-            photo: "stub",
-          });
-        fetch(`../img/${value.product.img}-Nutrunners.svg`)
-        .then((res) => res.blob())
-        .then((blob) => {
-            // Read the Blob as DataURL using the FileReader API
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                // Logs data:image/jpeg;base64,wL2dvYWwgbW9yZ...
+        prod_id: key,
+        amount: value.amount,
+        vendorCode: value.product.vendorCode,
+        name: value.product.name,
+        price: value.product.price,
+        sum: value.product.price * value.amount,
+        photo: "stub",
+      });
+      axios
+      .get(`../img/DFL-Nutrunners.svg`, {
+        headers: {
+          "Content-Type": " text/html",
+        },
+      })
+      .then((res)=>{
+        return res.data
+      })
+      .then((data)=>{
 
-                // Convert to Base64 string
-                if(reader.result){
-                const base64 = (reader.result);
-                this.base64Images.set(key,base64.toString())
-                console.log(base64);
-                }
-                
-                // Logs wL2dvYWwgbW9yZ...
-            };
-            reader.readAsDataURL(blob);
+      })
+      fetch(`../img/${value.product.img}-Nutrunners.svg`)
+        .then((res) => {
+          return res.blob();
+        })
+        .then((blob) => {
+          // Read the Blob as DataURL using the FileReader API
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            // Logs data:image/jpeg;base64,wL2dvYWwgbW9yZ...
+
+            // Convert to Base64 string
+            if (reader.result) {
+              const base64 = reader.result;
+              this.base64Images.set(key, base64.toString());
+              console.log(base64);
+            }
+
+            // Logs wL2dvYWwgbW9yZ...
+          };
+          reader.readAsDataURL(blob);
         });
     });
-    this.productsForCO = products
+    this.productsForCO = products;
   },
 });
 </script>
