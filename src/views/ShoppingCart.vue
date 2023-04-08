@@ -293,7 +293,6 @@ export default defineComponent({
     },
   },
   async mounted() {
-    console.log(this.shoppingCart.cart);
     let products: unknown[] = [];
     let image = this.$refs.prodPic;
     let imgBase64;
