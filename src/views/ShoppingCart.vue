@@ -203,14 +203,16 @@ import { useShoppingCartStore } from "@/stores/shoppingCart";
 import axios from "axios";
 import { SignJWT as signingTool } from "jose";
 import { defineComponent } from "vue";
+import { createClient } from "@supabase/supabase-js";
 
 export default defineComponent({
   data() {
     return {
-      fullName:"",
+      fullName: "",
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
+      totalSum:0
     };
   },
   methods: {
@@ -242,14 +244,14 @@ export default defineComponent({
         .then((value) => {
           bearer = value;
         });
-      let dateForCO = new Date(Date.now())
-      let expirationDate = new Date(dateForCO)
-      expirationDate.setMonth(expirationDate.getMonth()+1)
+      let dateForCO = new Date(Date.now());
+      let expirationDate = new Date(dateForCO);
+      expirationDate.setMonth(expirationDate.getMonth() + 1);
       let preparedData = {
         docId: "001",
         currentDate: dateForCO.toLocaleString().split(",")[0],
         expirationDate: expirationDate.toLocaleString().split(",")[0],
-        fullName:this.fullName,
+        fullName: this.fullName,
         products: this.productsForCO,
       };
       console.log(preparedData);
@@ -277,7 +279,7 @@ export default defineComponent({
           return res.data;
         })
         .then((data) => {
-          axios
+          let docLink:Promise<string> = axios
             .get(data.response, { responseType: "blob" })
             .then((response) => {
               const blob = new Blob([response.data], {
@@ -288,8 +290,26 @@ export default defineComponent({
               link.download = "Invoice_Newton_M";
               link.click();
               URL.revokeObjectURL(link.href);
+              return link.href
             });
+          return docLink
+        })
+        .then((docLink) => {
+          this.saveOrderToDB(docLink);
         });
+    },
+    async saveOrderToDB(dockLink:string) {
+      const supabaseUrl = "https://pamxsrdnxuqjelrudpca.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhbXhzcmRueHVxamVscnVkcGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODI0MzI4NDEsImV4cCI6MTk5ODAwODg0MX0.OV31fqjnNfL-x5vptKOQf2IQdHl978jZjmIVz9dJuwg";
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      /*const { data, error } =*/ await supabase
+        .from("Orders")
+        .insert([{ overall_price: this.totalSum, 
+        document:dockLink
+      }]).then((value)=>{
+        console.log("After inserting data into Order table we get:",value)
+      });
     },
   },
   async mounted() {
@@ -306,18 +326,17 @@ export default defineComponent({
         productSum: value.product.price * value.amount,
         photo: "stub",
       });
+      this.totalSum = this.totalSum + (value.product.price * value.amount)
       axios
-      .get(`../img/DFL-Nutrunners.svg`, {
-        headers: {
-          "Content-Type": " text/html",
-        },
-      })
-      .then((res)=>{
-        return res.data
-      })
-      .then((data)=>{
-
-      })
+        .get(`../img/DFL-Nutrunners.svg`, {
+          headers: {
+            "Content-Type": " text/html",
+          },
+        })
+        .then((res) => {
+          return res.data;
+        })
+        .then((data) => {});
       fetch(`../img/${value.product.img}-Nutrunners.svg`)
         .then((res) => {
           return res.blob();
