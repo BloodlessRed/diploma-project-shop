@@ -1,97 +1,129 @@
 <template>
-    <Header></Header>
-    <div class="main-wrapper">
-        <div class="introduction">
-            <p>{{ introduction }}</p>
-        </div>
-        <div class="category-block">
-            <div class="category" >
-                <router-link v-for="category in categories" :to="{name: 'Category', params:{category:category.name}}">
-                    <span>
-                        {{ category.name.charAt(0).toUpperCase() + category.name.slice(1) }}
-                    </span>
-                    <img :src="`./img/${category.src}`">
-                </router-link>
-            </div>
-        </div>
+  <div class="main-wrapper">
+    <div class="introduction">
+      <p>{{ introduction }}</p>
     </div>
+    <div class="category-block">
+      <div class="category">
+        <router-link
+          v-for="manufacturer in manufacturers"
+          :to="{
+            name: 'Manufacturer',
+            params: { manufacturer: manufacturer },
+          }"
+        >
+          <span>
+            {{ manufacturer }}
+          </span>
+          <img class="manufacturer-logo" :src="`./img/${manufacturer}.svg`" />
+        </router-link>
+      </div>
+    </div>
+    <router-view />
+  </div>
 </template>
 <script lang="ts" scoped>
-import { defineComponent } from 'vue';
-import { RouterLink } from 'vue-router';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import axios from "axios";
+import { defineComponent, inject } from "vue";
+import { RouterLink } from "vue-router";
 
 export default defineComponent({
-    data() {
-        return {
-            introduction: 'Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса',
-            categories: [
-                {
-                    name: "nutrunners",
-                    src: "category1.svg"
-                },
-                {
-                    name: "SecondaryMarket",
-                    src: "category1.svg"
-                }
-            ]
-        }
+  setup() {
+    const supabase: SupabaseClient | undefined = inject("supabase");
+    return {
+      supabase
+    };
+  },
+  data() {
+    return {
+      introduction:
+        "Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса",
+      manufacturers: [] as any[],
+    };
+  },
+  async mounted() {
+    if (this.supabase == undefined) {
+      return;
     }
-})
+    await this.supabase
+      .from("distinct_manufacturers")
+      .select("manufacturer")
+      .then((value) => {
+         value.data != null ? this.manufacturers = value.data.map(val=>val.manufacturer) : null;
+         console.log(this.manufacturers)
+      });
+  },
+});
 </script>
 <style scoped>
 .main-wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0px 220px
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 220px;
 }
 
 .main-wrapper * {
-    width: 100%;
+  width: 100%;
 }
 
 img {
-    max-width: fit-content;
+  max-width: fit-content;
 }
 
 .introduction {
-    display: flex;
+  display: flex;
 }
 
 .introduction:first-child {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 28px;
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
 }
 
 .slider {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .category-block {
-    display: flex;
-    justify-content: space-evenly;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .category {
-    display: flex;
-    justify-content: flex-start;
-
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  max-height: 10vh;
 }
 
 .category p {
-    max-width: calc(10% + 5px);
+  max-width: calc(10% + 5px);
 }
 .category a {
-    width: fit-content;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+  text-decoration: none;
+  color: #38363a;
+  font-weight: bolder;
+  font: 1.8rem 'Noto Sans', sans-serif;
+  outline: solid 0.1rem grey ;
+  border-radius: 0.5rem;
+  height: 50%;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
-span{
-    margin:0 10px;
+.manufacturer-logo{
+  width: auto;
+  height: 90%;
+  margin: 0 10px
+}
+
+span {
+  margin: 0 10px;
 }
 </style>

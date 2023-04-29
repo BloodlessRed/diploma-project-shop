@@ -18,7 +18,7 @@
     </div>
     <div class="line">
       <div class="button-space">
-        <router-link :to="{ name: 'Home' }">Категории</router-link>
+        <router-link :to="{ path:'/' }">Категории</router-link>
         <div class="search-wrapper">
           <input class="search-bar" type="text" placeholder="Поиск" />
           <button class="search-button">

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ProductsInCategory from '../views/ProductsInCategory.vue';
+import ManufacturerSpecificProducts from '../views/ManufacturerSpecificProducts.vue';
 import MainPage from '../views/MainPage.vue';
 import ProductPage from '../views/ProductPage.vue';
 import ShoppingCart from '../views/ShoppingCart.vue';
@@ -11,14 +11,17 @@ const router = createRouter({
   routes: [
     {
       path:"/", 
-      name:"Home", 
-      component: MainPage
-    },
-    {
-      path:"/:category", 
-      name:"Category", 
-      component: ProductsInCategory, 
-      props:true
+      // name:"HomePage1", 
+      component: MainPage,
+      redirect:{name:'Manufacturer', params:{manufacturer:'nutrunners'}},
+      children:[
+        {
+          path:"/:manufacturer", 
+          name:"Manufacturer", 
+          component: ManufacturerSpecificProducts, 
+          props:true
+        }
+      ]
     },
     {
       path:"/:category/:product_id", 

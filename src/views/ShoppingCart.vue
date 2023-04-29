@@ -202,17 +202,23 @@ import { ShoppingCartProduct } from "@/model/ShoppingCartProduct";
 import { useShoppingCartStore } from "@/stores/shoppingCart";
 import axios from "axios";
 import { SignJWT as signingTool } from "jose";
-import { defineComponent } from "vue";
-import { createClient } from "@supabase/supabase-js";
+import { defineComponent, inject } from "vue";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export default defineComponent({
+  setup() {
+    const supabase:SupabaseClient | undefined = inject('supabase')
+    return{
+      supabase
+    }
+  },
   data() {
     return {
       fullName: "",
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
-      totalSum:0
+      totalSum: 0,
     };
   },
   methods: {
@@ -237,7 +243,7 @@ export default defineComponent({
       };
       let API_SECRET_CODE =
         "19b3212fa4c0a6c7c930285bf8bf7f363bbbe0689597f7c6a605a0d8bd085e11";
-      let JWT = await new signingTool(origPlaceholder)
+      await new signingTool(origPlaceholder)
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime("1h")
         .sign(new TextEncoder().encode(API_SECRET_CODE))
@@ -279,7 +285,7 @@ export default defineComponent({
           return res.data;
         })
         .then((data) => {
-          let docLink:Promise<string> = axios
+          let docLink: Promise<string> = axios
             .get(data.response, { responseType: "blob" })
             .then((response) => {
               const blob = new Blob([response.data], {
@@ -290,26 +296,25 @@ export default defineComponent({
               link.download = "Invoice_Newton_M";
               link.click();
               URL.revokeObjectURL(link.href);
-              return link.href
+              return link.href;
             });
-          return docLink
+          return docLink;
         })
         .then((docLink) => {
           this.saveOrderToDB(docLink);
         });
     },
-    async saveOrderToDB(dockLink:string) {
-      const supabaseUrl = "https://pamxsrdnxuqjelrudpca.supabase.co";
-      const supabaseKey =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhbXhzcmRueHVxamVscnVkcGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODI0MzI4NDEsImV4cCI6MTk5ODAwODg0MX0.OV31fqjnNfL-x5vptKOQf2IQdHl978jZjmIVz9dJuwg";
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      /*const { data, error } =*/ await supabase
-        .from("Orders")
-        .insert([{ overall_price: this.totalSum, 
-        document:dockLink
-      }]).then((value)=>{
-        console.log("After inserting data into Order table we get:",value)
-      });
+    async saveOrderToDB(dockLink: string) {
+      if (this.supabase != undefined) {
+        await this.supabase
+          .from("Orders")
+          .insert([{ overall_price: this.totalSum, document: dockLink }])
+          .then((value) => {
+            console.log("After inserting data into Order table we get:", value);
+          });
+      }else{
+        console.log("Доступ к БД закрыт")
+      }
     },
   },
   async mounted() {
@@ -326,7 +331,7 @@ export default defineComponent({
         productSum: value.product.price * value.amount,
         photo: "stub",
       });
-      this.totalSum = this.totalSum + (value.product.price * value.amount)
+      this.totalSum = this.totalSum + value.product.price * value.amount;
       axios
         .get(`../img/DFL-Nutrunners.svg`, {
           headers: {
@@ -345,16 +350,10 @@ export default defineComponent({
           // Read the Blob as DataURL using the FileReader API
           const reader = new FileReader();
           reader.onloadend = () => {
-            // Logs data:image/jpeg;base64,wL2dvYWwgbW9yZ...
-
-            // Convert to Base64 string
             if (reader.result) {
               const base64 = reader.result;
               this.base64Images.set(key, base64.toString());
-              console.log(base64);
             }
-
-            // Logs wL2dvYWwgbW9yZ...
           };
           reader.readAsDataURL(blob);
         });

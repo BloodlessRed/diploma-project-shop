@@ -6,21 +6,21 @@
       </div>
       <div class="site-content">
         <p>Поставщики</p>
-        <a v-for="supplier in suppliers">
+        <router-link :to="{name:'Manufacturer',params:{manufacturer: supplier}}"  v-for="supplier in suppliers">
           {{ supplier }}
-        </a>
+        </router-link >
       </div>
       <div class="site-content">
-        <p>Магазин</p>
-        <a v-for="category in categories">
+        <p>Категории товаров</p>
+        <router-link :to="{name: 'Manufacturer', params:{manufacturer: category}}" v-for="category in categories">
           {{ category }}
-        </a>
+        </router-link>
       </div>
       <div class="site-content">
         <p>Сервисные центры</p>
-        <a v-for="center in serviceCenters">
+        <router-link :to="{name:'Manufacturer', params:{manufacturer: center}}" v-for="center in serviceCenters">
           {{ center }}
-        </a>
+        </router-link>
       </div>
     </div>
     <div class="copyright-wrapper">
@@ -41,8 +41,8 @@ export default defineComponent({
     return {
       imgSrc: "logo.svg",
       suppliers: ["Поставщик1", "Поставщик2"],
-      categories: [],
-      serviceCenters: [],
+      categories: ["nutrunners", "SecondaryMarket"],
+      serviceCenters: ["Сервисный центр 1", "Сервисный центр 2"],
     };
   },
   methods: {
