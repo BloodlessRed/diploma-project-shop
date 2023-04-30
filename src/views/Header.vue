@@ -125,7 +125,6 @@ button {
   user-select: none;
   border: none;
   background: none;
-  font-family: "Noto Sans";
   font-style: normal;
   font-weight: 400;
   font-size: 18px;
@@ -150,7 +149,6 @@ button {
 
 .button-space > a {
   margin: 0 20px;
-  font-family: "Noto Sans";
   font-style: normal;
   font-weight: 400;
   font-size: 18px;
@@ -201,7 +199,6 @@ button {
   justify-content: right;
 }
 .product-amount-counter {
-  font-family: "Noto Sans";
   font-style: normal;
   font-weight: 800;
   font-size: 14px;

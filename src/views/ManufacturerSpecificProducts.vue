@@ -1,9 +1,9 @@
 <template>
-  <div class="product-specific-wrapper">
+  <div v-if="products.length > 0" class="product-specific-wrapper">
     <div class="products">
       <div class="item" v-for="product in cmptd_category">
         <img :src="`./img/${product.img}-Nutrunners.svg`" />
-        <p>{{ product.name }}</p>
+        <h3>{{ product.vendor_code }}</h3>
         <router-link
           :to="{
             name: 'Product',
@@ -11,7 +11,7 @@
           }"
         >
           <div class="to-product-box">
-            <p>Read more</p>
+            <p>Подробнее</p>
           </div>
         </router-link>
       </div>
@@ -20,18 +20,23 @@
       <img :src="`./img/manufacturer-line.svg`" />
       <div class="filter">
         <h3>Категории</h3>
-        <ul>
-          <li>Атлас</li>
-          <li>GSE</li>
-          <li>Ingersoll</li>
+        <ul class="category-list">
+          <li v-for="category in filters">
+            <input
+              type="checkbox"
+              :value="category.code"
+              v-model="selectedCategories"
+            />
+            {{ category.code }}
+          </li>
         </ul>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
-import axios from 'axios'
+import { defineComponent, inject } from "vue";
+import type { SupabaseClient } from "@supabase/supabase-js";
 export default defineComponent({
   props: {
     manufacturer: {
@@ -39,37 +44,24 @@ export default defineComponent({
       default: "no category selected",
     },
   },
+  setup() {
+    const supabase: SupabaseClient | undefined = inject("supabase");
+    return {
+      supabase,
+    };
+  },
   computed: {
     cmptd_category(): any[] {
-      console.log(this.manufacturer);
-      let routeParameter: string = this.manufacturer;
-      let products: any = [];
-      if (routeParameter == "nutrunners") {
-        console.log(this.products);
-        return this.products;
-      } else if (routeParameter == "SecondaryMarket") {
-        return [
-          {
-            id: 1,
-            img: "cable-pic-proto.svg",
-            name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
-            prodLink: "STUB",
-          },
-          {
-            id: 2,
-            img: "cable-pic-proto.svg",
-            name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
-            prodLink: "STUB",
-          },
-          {
-            id: 3,
-            img: "cable-pic-proto.svg",
-            name: "Second market Atlas Copco 4220-0982-15 15 meter Cable",
-            prodLink: "STUB",
-          },
-        ];
+      // console.log(this.products);
+      if(this.selectedCategories.length > 0){
+        let filtered_products: unknown[] = []
+        filtered_products = this.products.filter((item)=>{
+          return this.selectedCategories.includes(item.Categories.code)
+        })
+        console.log(this.selectedCategories,filtered_products)
+        return filtered_products
       }
-      return [{ id: 0, img: "null", name: "null", prodLink: "null" }];
+      return this.products;
     },
     categoryName(): string {
       console.log(this.$route.params);
@@ -78,18 +70,44 @@ export default defineComponent({
   },
   data() {
     return {
-      products: [],
+      products: [] as any[],
+      filters: [] as any[],
+      selectedCategories:[] as string[]
     };
   },
   mounted() {
-    axios.get("https://my-json-server.typicode.com/BloodlessRed/diploma-project-json-server/" +this.manufacturer)
-      .then((res) => {
-        this.products = res.data;
-      })
+    if (this.supabase == undefined) {
+      return;
+    }
+    this.supabase
+      .from("Products")
+      .select(
+        `id, description,price,manufacturer,img,vendor_code,
+        Categories (
+          code
+        )`
+        )
+      .eq("manufacturer", this.manufacturer)
+      .then((value) => {
+        console.log(value)
+        if (value.data != null) {
+          this.products = value.data;
+        }
+      });
+    this.supabase
+      .from("distinct_categories_for_manufacturers")
+      .select("code")
+      .eq("manufacturer", this.manufacturer)
+      .then((value) => {
+        if (value.data != null) {
+          this.filters = value.data;
+        }
+      });
   },
 });
 </script>
 <style scoped>
+
 .product-specific-wrapper {
   display: flex;
   /* justify-content: stretch; */
@@ -100,6 +118,7 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
+  flex-grow: 1;
 }
 
 .item img {
@@ -113,15 +132,18 @@ export default defineComponent({
   font-weight: 400;
   font-size: 14px;
   /* line-height: 19px; */
-
+  margin: 0;
   text-align: center;
-
+  outline: none;
   color: #000000;
 }
-
+.item a {
+  text-decoration: none;
+}
 .item div:last-child {
   background: #e5e5e5;
   border-radius: 4px;
+  padding: 5px 10px;
 }
 
 .search-box {
@@ -140,5 +162,17 @@ export default defineComponent({
 
 .filter {
   padding: 0px 0px 3px 10px;
+  font-family: 'Open Sans', sans-serif; 
+  font-size: 18px; 
+  color: #333; 
+} 
+
+.category-list {
+  list-style: none;
+}
+.category-list li {
+  font-family: 'Open Sans', sans-serif; 
+  font-size: 16px; 
+  color: #333; 
 }
 </style>

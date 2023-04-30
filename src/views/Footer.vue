@@ -77,7 +77,6 @@ export default defineComponent({
 
 .site-content > p,
 a {
-  font-family: "Noto Sans";
   font-style: normal;
   font-weight: 400;
   font-size: 18px;

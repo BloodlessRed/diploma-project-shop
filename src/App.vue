@@ -22,6 +22,9 @@ export default defineComponent({
 
 <style>
 /* Global styles */
+html{
+  font-family: 'Open Sans', sans-serif;
+}
 .item {
     width: min-content;
     display: flex;
