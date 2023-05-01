@@ -32,13 +32,13 @@ export default defineComponent({
   setup() {
     const supabase: SupabaseClient | undefined = inject("supabase");
     return {
-      supabase
+      supabase,
     };
   },
   data() {
     return {
       introduction:
-        "Добро пожаловать в магазин компании. Здес мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса",
+        "Добро пожаловать в магазин компании. Здесь мы продаем инструменты и запчасти от различных поставщиков для сборочного процесса",
       manufacturers: [] as any[],
     };
   },
@@ -50,8 +50,10 @@ export default defineComponent({
       .from("distinct_manufacturers")
       .select("manufacturer")
       .then((value) => {
-         value.data != null ? this.manufacturers = value.data.map(val=>val.manufacturer) : null;
-         console.log(this.manufacturers)
+        value.data != null
+          ? (this.manufacturers = value.data.map((val) => val.manufacturer))
+          : null;
+        console.log(this.manufacturers);
       });
   },
 });
@@ -62,7 +64,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0px 220px;
+  padding: 0px 220px 4% 220px;
 }
 
 .main-wrapper * {
@@ -107,8 +109,8 @@ img {
   text-decoration: none;
   color: #38363a;
   font-weight: bolder;
-  font: 1.8rem 'Noto Sans', sans-serif;
-  outline: solid 0.1rem grey ;
+  font: 1.8rem "Noto Sans", sans-serif;
+  outline: solid 0.1rem grey;
   border-radius: 0.5rem;
   height: 50%;
   width: fit-content;
@@ -116,10 +118,10 @@ img {
   justify-content: flex-start;
   align-items: center;
 }
-.manufacturer-logo{
+.manufacturer-logo {
   width: auto;
   height: 90%;
-  margin: 0 10px
+  margin: 0 10px;
 }
 
 span {

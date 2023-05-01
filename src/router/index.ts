@@ -13,7 +13,7 @@ const router = createRouter({
       path:"/", 
       // name:"HomePage1", 
       component: MainPage,
-      redirect:{name:'Manufacturer', params:{manufacturer:'nutrunners'}},
+      redirect:{name:'Manufacturer', params:{manufacturer:'makita'}},
       children:[
         {
           path:"/:manufacturer", 

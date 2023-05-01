@@ -3,8 +3,8 @@
     <table class="cart-items">
       <tr>
         <th>Фото</th>
-        <th>Название</th>
         <th>Артикул</th>
+        <th>Описание</th>
         <th>Цена</th>
         <th>Кол-во</th>
         <th>Сумма</th>
@@ -18,10 +18,10 @@
             }-Nutrunners.svg`"
           />
         </td>
-        <td class="product-name-wrapper">
-          {{ getProductFromCart(itemId).product.name }}
-        </td>
         <td>{{ getProductFromCart(itemId).product.vendorCode }}</td>
+        <td class="product-name-wrapper">
+          {{ getProductFromCart(itemId).product.description }}
+        </td>
         <td>{{ getProductFromCart(itemId).product.price }}</td>
         <td>{{ getProductFromCart(itemId).amount }}</td>
         <td>
@@ -207,10 +207,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export default defineComponent({
   setup() {
-    const supabase:SupabaseClient | undefined = inject('supabase')
-    return{
-      supabase
-    }
+    const supabase: SupabaseClient | undefined = inject("supabase");
+    return {
+      supabase,
+    };
   },
   data() {
     return {
@@ -312,8 +312,8 @@ export default defineComponent({
           .then((value) => {
             console.log("After inserting data into Order table we get:", value);
           });
-      }else{
-        console.log("Доступ к БД закрыт")
+      } else {
+        console.log("Доступ к БД закрыт");
       }
     },
   },
@@ -326,7 +326,7 @@ export default defineComponent({
         prod_id: key,
         amount: value.amount,
         vendorCode: value.product.vendorCode,
-        name: value.product.name,
+        name: value.product.description,
         price: value.product.price,
         productSum: value.product.price * value.amount,
         photo: "stub",

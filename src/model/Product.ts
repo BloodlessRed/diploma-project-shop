@@ -1,22 +1,28 @@
 export class Product{
         id:number;
+        description:string;
+        manufacturer:string;
         vendorCode: string;
-        name:string
+        category:string
         price:number
         img:string;
-        constructor(id?:number, vendorCode?:string, price?:number, name?:string, img?:string, prodLink?:string){
-            if(id && vendorCode && price && name && img && prodLink){
+        constructor(id?:number, description?:string, manufacturer?:string, category?:string, vendorCode?:string, price?:number, img?:string,){
+            if(id && description && manufacturer && category && vendorCode && price && img){
                 this.id = id;
+                this.description = description
+                this.manufacturer = manufacturer
+                this.category = category
                 this.vendorCode = vendorCode;
-                this.price = price
-                this.name = name;
+                this.price = price                
                 this.img = img;         
             }else{
                 this.id = -1;
-                this.vendorCode = ""
-                this.price = -1
-                this.name = "";
-                this.img = "";       
+                this.description = 'no description'
+                this.manufacturer = 'no manufacturer'
+                this.category = 'no category'
+                this.vendorCode = 'no vendorCode';
+                this.price = 0                
+                this.img = 'no image';       
             }
         }
         

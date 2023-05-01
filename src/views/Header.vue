@@ -199,6 +199,7 @@ button {
   justify-content: right;
 }
 .product-amount-counter {
+  font-family: Arial, Helvetica, sans-serif;
   font-style: normal;
   font-weight: 800;
   font-size: 14px;
@@ -206,9 +207,5 @@ button {
 
   color: #ffffff;
   position: absolute;
-  /* left: 94.84%;
-right: 4.69%;
-top: 31.11%;
-bottom: 56.11%; */
 }
 </style>
