@@ -43,10 +43,17 @@ export const useShoppingCartStore = defineStore("shoppingCart", {
       if (id != undefined) {
         let item = this.cart.get(id);
         if (item != undefined) {
-          item.amount= item.amount-1;
-          if (item.amount <= 0 && confirm("Удалить товар из корзины?")) {
-            this.cart.delete(id)
-          }
+          item.amount = item.amount - 1;
+          if (item.amount <= 0) {
+            if (confirm("Удалить товар из корзины?")) {
+              console.log("item deleted");
+              this.cart.delete(id)
+              console.log(this.cart)
+            }else {
+              console.log("returned amount to 1");
+              item.amount = item.amount + 1;
+            }
+          } 
         } else {
           alert("Item was not in the cart. Please, try again!");
         }

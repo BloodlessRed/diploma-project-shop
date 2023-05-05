@@ -9,7 +9,7 @@
         <th>Кол-во</th>
         <th>Сумма</th>
       </tr>
-      <tr v-for="itemId in shoppingCart.cart.size">
+      <tr v-for="itemId in Array.from(shoppingCart.cart.keys())">
         <td>
           <img
             ref="prodPic"
@@ -248,7 +248,7 @@ export default defineComponent({
   },
   methods: {
     getProductFromCart(id: number): ShoppingCartProduct {
-      let prod = this.shoppingCart.cart.get(id - 1);
+      let prod = this.shoppingCart.cart.get(id);
       if (prod) {
         return prod;
       } else {
@@ -355,7 +355,7 @@ export default defineComponent({
     let products: unknown[] = [];
     let image = this.$refs.prodPic;
     let imgBase64;
-    this.shoppingCart.cart.forEach((value, key) => {
+    await this.shoppingCart.cart.forEach((value, key) => {
       products.push({
         prod_id: key,
         amount: value.amount,
@@ -392,6 +392,8 @@ export default defineComponent({
           reader.readAsDataURL(blob);
         });
     });
+    console.log("KEY ",this.shoppingCart.cart.keys)
+    console.log("CURRENT PRODUCTS ",products)
     this.productsForCO = products;
   },
 });
