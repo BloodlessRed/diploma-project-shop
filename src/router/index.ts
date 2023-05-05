@@ -24,7 +24,7 @@ const router = createRouter({
       ]
     },
     {
-      path:"/:category/:product_id", 
+      path:"/product_page/:product_id", 
       name:"Product", 
       component: ProductPage, 
       props:true

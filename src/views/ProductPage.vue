@@ -7,7 +7,7 @@
       <div class="product-info">
         <h1>{{ product.vendorCode }}</h1>
         <p>Описание: {{ product.description }}</p>
-        <p>Цена: {{ formatPrice(product.price) }}</p>
+        <p>Цена: {{ shoppingCart.formatPrice(product.price) }} rub</p>
         <p>Категория: {{ product.category }}</p>
         <p>
           Производитель:
@@ -21,26 +21,30 @@
         </p>
         <!-- В наличии или нет -->
         <div class="button-section">
-          <button @click="addToShoppingCart()">Добавить в корзину</button>
-          <button>Получить взрыв-схему</button>
+          <div class="custom-button" @click="addToShoppingCart()">
+            Добавить в корзину
+          </div>
+          <div class="custom-button">Получить взрыв-схему</div>
         </div>
       </div>
     </div>
-    <h3 color="#0055D3">Похожие продукты</h3>
-    <div class="similar-products">
-      <div class="item" v-for="item in similarProducts">
-        <img :src="`../img/${item.img}-Nutrunners.svg`" />
-        <p>{{ item.vendorCode }}</p>
-        <router-link
-          :to="{
-            name: 'Product',
-            params: { category: item.category, product_id: item.id },
-          }"
-        >
-          <div class="to-product-box">
-            <span>Подробнее</span>
-          </div>
-        </router-link>
+    <div class="similar-products-wrapper">
+      <h3 color="#0055D3">Похожие продукты</h3>
+      <div class="similar-products">
+        <div class="item" v-for="item in similarProducts">
+          <img :src="`../img/${item.img}-Nutrunners.svg`" />
+          <p>{{ item.vendorCode }}</p>
+          <router-link
+            :to="{
+              name: 'Product',
+              params: { category: item.category, product_id: item.id },
+            }"
+          >
+            <div class="custom-button">
+              <span>Подробнее</span>
+            </div>
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -74,11 +78,11 @@ export default defineComponent({
       shoppingCart: useShoppingCartStore(),
     };
   },
-  mounted() {
+  async mounted() {
     if (this.supabase == undefined) {
       return;
     }
-    this.supabase
+    await this.supabase
       .from("Products")
       .select(`*, Categories(code)`)
       .eq("id", this.product_id)
@@ -104,7 +108,7 @@ export default defineComponent({
     this.supabase
       .from("Products")
       .select(`*, Categories!inner(code)`)
-      .eq("Categories.code", this.category)
+      .eq("Categories.code", this.product.category)
       .then((value) => {
         console.log("Affiliated products are ", value);
         value.data?.map((item) => {
@@ -128,28 +132,26 @@ export default defineComponent({
     addToShoppingCart() {
       console.log(this.product);
       this.shoppingCart.addToCart(this.product);
-    },
-    formatPrice(price: number): string {
-      return Intl.NumberFormat("ru-RU", { useGrouping: true }).format(price);
-    },
+    }
   },
 });
 </script>
 <style scoped>
 .main-wrapper {
-  display: flex;
-  flex-direction: column;
-  /* justify-content: stretch; */
-  padding: 220px;
+  padding: 50px 220px;
 }
 .product {
   display: flex;
   justify-content: center;
   align-self: center;
+  margin-bottom: 5%;
+  padding: 10px 0;
+  width: 50%;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.25);
 }
 .product-info {
   width: 50%;
-  margin-bottom: 5%;
 }
 .product-info > p {
   font-size: 17px;
@@ -160,6 +162,8 @@ export default defineComponent({
 }
 .img-container {
   margin: 0 50px;
+  display: flex;
+  align-items: center;
 }
 .img-container > img {
   height: 250px;
@@ -167,5 +171,20 @@ export default defineComponent({
 }
 .similar-products {
   display: flex;
+  justify-content: center;
+}
+
+.product .custom-button {
+  margin-right: 5px;
+}
+
+.similar-products-wrapper{
+  width: 50%;
+  padding: 5px 0;
+  border-radius: 5px;
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.25);;
+}
+.similar-products-wrapper > h3{
+ text-align: center;
 }
 </style>

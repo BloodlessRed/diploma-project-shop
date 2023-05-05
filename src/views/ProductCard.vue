@@ -6,12 +6,11 @@
       :to="{
         name: 'Product',
         params: {
-          category: passed_product.category,
           product_id: passed_product.id,
         },
       }"
     >
-      <div class="to-product-box">
+      <div class="custom-button">
         <span>Подробнее</span>
       </div>
     </router-link>
@@ -54,9 +53,9 @@ export default defineComponent({
 .item a {
   text-decoration: none;
 }
-.item div:last-child {
+/* .item div:last-child {
   background: #e5e5e5;
   border-radius: 4px;
   padding: 5px 10px;
-}
+} */
 </style>

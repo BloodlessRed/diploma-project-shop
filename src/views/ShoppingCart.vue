@@ -18,17 +18,42 @@
             }-Nutrunners.svg`"
           />
         </td>
-        <td>{{ getProductFromCart(itemId).product.vendorCode }}</td>
+        <td>
+          <router-link
+            :to="{
+              name: 'Product',
+              params: { product_id: getProductFromCart(itemId).product.id },
+            }"
+            >{{ getProductFromCart(itemId).product.vendorCode }}</router-link
+          >
+        </td>
         <td class="product-name-wrapper">
           {{ getProductFromCart(itemId).product.description }}
         </td>
-        <td>{{ getProductFromCart(itemId).product.price }}</td>
-        <td>{{ getProductFromCart(itemId).amount }}</td>
         <td>
           {{
+            shoppingCart.formatPrice(getProductFromCart(itemId).product.price)
+          }}
+          rub
+        </td>
+        <td class="amount-cell">
+          <div class="counter-wrapper">
+            <div class="custom-button" @click="addToCart(itemId)"><span>&lt;</span></div>
+            <div class="product-counter">
+              {{ getProductFromCart(itemId).amount }}
+            </div>
+            <div class="custom-button" @click="removeFromCart(itemId)"><span>></span></div>
+          </div>
+        </td>
+        <td>
+          {{
+            shoppingCart.formatPrice(
             getProductFromCart(itemId).amount *
             getProductFromCart(itemId).product.price
+            )
           }}
+
+          rub
         </td>
       </tr>
     </table>
@@ -230,6 +255,15 @@ export default defineComponent({
         return new ShoppingCartProduct();
       }
     },
+    addToCart(prodId: number) {
+      let retrievedProduct: ShoppingCartProduct =
+        this.getProductFromCart(prodId);
+      this.shoppingCart.addToCart(retrievedProduct.product);
+    },
+    removeFromCart(prodId:number){
+      let retrievedProduct: ShoppingCartProduct = this.getProductFromCart(prodId);
+      this.shoppingCart.removeFromCart(retrievedProduct.product)
+    },
     async generateCommercialOffer() {
       let bearer;
       let origHeader = {
@@ -363,6 +397,26 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+.product-counter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #535c65;
+  font-size: 16px;
+  width: 26%;
+  height: 30px;
+  text-align: center;
+  border: 0;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.03);
+}
+.counter-wrapper{
+  display: flex;
+  justify-content: center;
+}
+.custom-button {
+  padding: 5px 10px;
+}
 td > img {
   width: 150px;
 }
@@ -371,6 +425,7 @@ td > img {
   flex-direction: column;
   width: 100%;
   flex-grow: 1;
+  justify-content: center;
 }
 .cart-items > tr:first-of-type {
   background: rgba(255, 255, 255, 0.03);
@@ -385,6 +440,9 @@ td > img {
 .cart-items th,
 td {
   text-align: center;
+}
+.amount-cell {
+  width: 13%;
 }
 .client-info {
   margin: 20px 0;
@@ -402,7 +460,8 @@ td {
   align-self: center;
 }
 .product-name-wrapper {
-  width: 55%;
+  padding: 0 10px;
+  width: 50%;
 }
 .mandatory-asterisk {
   vertical-align: middle;

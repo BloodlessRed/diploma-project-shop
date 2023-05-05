@@ -34,16 +34,44 @@ html{
     margin: 0 20px 20px 20px;
     padding: 10px;
     background: #FFFFFF;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 1px 8px 5px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
 }
-.to-product-box{
+/* .to-product-box{
   background: #e5e5e5;
     border-radius: 4px;
     padding: 5px 10px;
+} */
+
+.custom-button {
+  background-color: #2e75b6; /* Corporate blue */
+  border: none;
+  color: white; /* White text */
+  border-radius: 4px;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.custom-button:hover {
+  background-color: #5c9bcf; /* Lighter blue */
+}
+
+.custom-button:active {
+  background-color: #0a3f6c; /* Darker blue */
 }
 
 a{
   text-decoration: none;
+}
+
+.main-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 220px 4% 220px;
 }
 </style>

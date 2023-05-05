@@ -24,7 +24,6 @@
 </template>
 <script lang="ts" scoped>
 import type { SupabaseClient } from "@supabase/supabase-js";
-import axios from "axios";
 import { defineComponent, inject } from "vue";
 import { RouterLink } from "vue-router";
 
@@ -59,13 +58,6 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.main-wrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0px 220px 4% 220px;
-}
 
 .main-wrapper * {
   width: 100%;

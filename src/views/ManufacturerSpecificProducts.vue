@@ -1,14 +1,12 @@
 <template>
   <div v-if="products.length > 0" class="product-specific-wrapper">
     <div class="products">
-      <transition-group name="product-list">
-        <ProductCard
-          v-for="(product, index) in cmptd_category"
-          :key="index"
-          :product="product"
-        >
-        </ProductCard>
-      </transition-group>
+      <ProductCard
+        v-for="(product, index) in cmptd_category"
+        :key="index"
+        :product="product"
+      >
+      </ProductCard>
     </div>
     <div class="search-box">
       <div class="filter">
@@ -94,16 +92,17 @@ export default defineComponent({
         console.log(value);
         if (value.data != null) {
           value.data.map((item) => {
-            
-            this.products.push( new Product(
-              item.id,
-              item.description,
-              item.manufacturer,
-              item.Categories.code,
-              item.vendor_code,
-              item.price,
-              item.img
-            ))
+            this.products.push(
+              new Product(
+                item.id,
+                item.description,
+                item.manufacturer,
+                item.Categories.code,
+                item.vendor_code,
+                item.price,
+                item.img
+              )
+            );
           });
         }
       });
@@ -123,7 +122,7 @@ export default defineComponent({
 .product-specific-wrapper {
   display: flex;
   /* justify-content: stretch; */
-  padding:  10px 50px;
+  padding: 10px 50px;
 }
 
 .products {
@@ -132,25 +131,6 @@ export default defineComponent({
   flex-wrap: wrap;
   flex-grow: 1;
 }
-
-/* Animation section begins */
-
-.product-list-enter-from,
-.product-list-leave-to {
-  opacity: 0;
-}
-
-.product-list-enter-to,
-.product-list-leave-from {
-  opacity: 1;
-}
-
-.product-list-enter-active,
-.product-list-leave-active {
-  transition: opacity 0.5s;
-}
-
-/* Animation section ends */
 
 .search-box {
   height: fit-content;
