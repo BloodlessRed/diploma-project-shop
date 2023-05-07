@@ -322,6 +322,7 @@ export default defineComponent({
           let docLink: Promise<string> = axios
             .get(data.response, { responseType: "blob" })
             .then((response) => {
+              console.log(response)
               const blob = new Blob([response.data], {
                 type: "application/pdf",
               });
@@ -360,7 +361,7 @@ export default defineComponent({
         prod_id: key,
         amount: value.amount,
         vendorCode: value.product.vendorCode,
-        name: value.product.description,
+        description: value.product.description,
         price: value.product.price,
         productSum: value.product.price * value.amount,
         photo: "stub",

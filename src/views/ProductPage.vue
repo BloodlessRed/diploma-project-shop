@@ -24,7 +24,9 @@
           <div class="custom-button" @click="addToShoppingCart()">
             Добавить в корзину
           </div>
-          <div class="custom-button">Получить взрыв-схему</div>
+          <div v-if="hasSchema" class="custom-button" @click="downloadExplosionSchema(product.vendorCode)">
+            Получить взрыв-схему
+          </div>
         </div>
       </div>
     </div>
@@ -76,6 +78,7 @@ export default defineComponent({
       product: new Product(),
       similarProducts: [] as Product[],
       shoppingCart: useShoppingCartStore(),
+      hasSchema: true,
     };
   },
   async mounted() {
@@ -101,9 +104,19 @@ export default defineComponent({
             item.img
           );
         })[0];
+
         current_product != undefined
           ? (this.product = current_product)
           : undefined;
+      })
+      .then(()=>{
+        console.log(this.product.vendorCode)
+        fetch("../explosion_schemas/" + this.product.vendorCode + ".pdf")
+        .then(response=>{
+          if(!(response.status >= 200 && response.status < 300)){
+            this.hasSchema = false
+          }
+        })
       });
     this.supabase
       .from("Products")
@@ -132,12 +145,30 @@ export default defineComponent({
     addToShoppingCart() {
       console.log(this.product);
       this.shoppingCart.addToCart(this.product);
-    }
+    },
+    downloadExplosionSchema(name: string) {
+      fetch("../explosion_schemas/" + name + ".pdf")
+        .then((value) => {
+          console.log(value)
+          return value.blob();
+        })
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = name +"_schema.pdf";
+          link.click();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((error)=>this.hasSchema=false);
+    },
   },
 });
 </script>
 <style scoped>
 .main-wrapper {
+  align-self: center;
+  width: 50%;
   padding: 50px 220px;
 }
 .product {
@@ -146,7 +177,6 @@ export default defineComponent({
   align-self: center;
   margin-bottom: 5%;
   padding: 10px 0;
-  width: 50%;
   border-radius: 5px;
   box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.25);
 }
@@ -178,13 +208,13 @@ export default defineComponent({
   margin-right: 5px;
 }
 
-.similar-products-wrapper{
-  width: 50%;
+.similar-products-wrapper {
+  width: 100%;
   padding: 5px 0;
   border-radius: 5px;
-  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.25);;
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.25);
 }
-.similar-products-wrapper > h3{
- text-align: center;
+.similar-products-wrapper > h3 {
+  text-align: center;
 }
 </style>
