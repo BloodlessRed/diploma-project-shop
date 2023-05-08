@@ -24,13 +24,17 @@
           <div class="custom-button" @click="addToShoppingCart()">
             Добавить в корзину
           </div>
-          <div v-if="hasSchema" class="custom-button" @click="downloadExplosionSchema(product.vendorCode)">
+          <div
+            v-if="hasSchema"
+            class="custom-button"
+            @click="downloadExplosionSchema(product.vendorCode)"
+          >
             Получить взрыв-схему
           </div>
         </div>
       </div>
     </div>
-    <div class="similar-products-wrapper">
+    <div class="similar-products-wrapper" v-if="similarProducts.length > 0">
       <h3 color="#0055D3">Похожие продукты</h3>
       <div class="similar-products">
         <div class="item" v-for="item in similarProducts">
@@ -61,11 +65,7 @@ export default defineComponent({
     product_id: {
       type: String,
       default: -1,
-    },
-    category: {
-      type: String,
-      default: -1,
-    },
+    }
   },
   setup() {
     const supabase: SupabaseClient | undefined = inject("supabase");
@@ -85,11 +85,13 @@ export default defineComponent({
     if (this.supabase == undefined) {
       return;
     }
+    console.log("current vendor code", this.product_id.toLocaleUpperCase())
     await this.supabase
       .from("Products")
       .select(`*, Categories(code)`)
-      .eq("id", this.product_id)
+      .ilike("vendor_code", "%"+this.product_id+"%")
       .then((value) => {
+        console.log(value)
         if (value == null) {
           return;
         }
@@ -109,14 +111,15 @@ export default defineComponent({
           ? (this.product = current_product)
           : undefined;
       })
-      .then(()=>{
-        console.log(this.product.vendorCode)
-        fetch("../explosion_schemas/" + this.product.vendorCode + ".pdf")
-        .then(response=>{
-          if(!(response.status >= 200 && response.status < 300)){
-            this.hasSchema = false
+      .then(() => {
+        console.log(this.product.vendorCode);
+        fetch("../explosion_schemas/" + this.product.vendorCode + ".pdf").then(
+          (response) => {
+            if (!(response.status >= 200 && response.status < 300)) {
+              this.hasSchema = false;
+            }
           }
-        })
+        );
       });
     this.supabase
       .from("Products")
@@ -125,7 +128,8 @@ export default defineComponent({
       .then((value) => {
         console.log("Affiliated products are ", value);
         value.data?.map((item) => {
-          if (item.Categories.code != null && item.id != this.product_id) {
+          if (item.Categories.code != null && item.id != this.product.id) {
+            console.log("ID - ",this.product.id)
             this.similarProducts.push(
               new Product(
                 item.id,
@@ -149,24 +153,25 @@ export default defineComponent({
     downloadExplosionSchema(name: string) {
       fetch("../explosion_schemas/" + name + ".pdf")
         .then((value) => {
-          console.log(value)
+          console.log(value);
           return value.blob();
         })
         .then((blob) => {
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = name +"_schema.pdf";
+          link.download = name + "_schema.pdf";
           link.click();
           window.URL.revokeObjectURL(url);
         })
-        .catch((error)=>this.hasSchema=false);
+        .catch((error) => (this.hasSchema = false));
     },
   },
 });
 </script>
 <style scoped>
 .main-wrapper {
+  justify-content: center;
   align-self: center;
   width: 50%;
   padding: 50px 220px;
@@ -175,6 +180,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-self: center;
+  width: 100%;
   margin-bottom: 5%;
   padding: 10px 0;
   border-radius: 5px;
@@ -184,6 +190,8 @@ export default defineComponent({
   width: 50%;
 }
 .product-info > p {
+  word-break: break-all;
+  white-space: normal;
   font-size: 17px;
   line-height: 1.3;
 }

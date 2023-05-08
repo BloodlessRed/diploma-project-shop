@@ -24,10 +24,15 @@ const router = createRouter({
       ]
     },
     {
-      path:"/product_page/:product_id", 
+      path:"/product_page/:product_id?", 
       name:"Product", 
       component: ProductPage, 
-      props:true
+      props:true,
+      beforeEnter:(to,from,enter)=>{
+        if(to.params.product_id.length > 0){
+          enter()
+        }
+      }
     },
     {
       path:"/cart",

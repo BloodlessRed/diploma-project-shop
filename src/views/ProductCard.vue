@@ -6,7 +6,7 @@
       :to="{
         name: 'Product',
         params: {
-          product_id: passed_product.id,
+          product_id: passed_product.vendorCode,
         },
       }"
     >

@@ -38,11 +38,11 @@
         </td>
         <td class="amount-cell">
           <div class="counter-wrapper">
-            <div class="custom-button" @click="addToCart(itemId)"><span>&lt;</span></div>
+            <div class="custom-button" @click="addToCart(itemId)"><span>+</span></div>
             <div class="product-counter">
               {{ getProductFromCart(itemId).amount }}
             </div>
-            <div class="custom-button" @click="removeFromCart(itemId)"><span>></span></div>
+            <div class="custom-button" @click="removeFromCart(itemId)"><span>-</span></div>
           </div>
         </td>
         <td>
