@@ -18,6 +18,13 @@ export const useShoppingCartStore = defineStore("shoppingCart", {
       });
       return counter;
     },
+    totalSum:(state) => {
+      let sum = 0
+      state.cart.forEach((item)=>{
+        sum = sum + item.product.price * item.amount
+      })
+      return sum
+    },
     entries: (state) => {
       return state.cart.entries();
     },

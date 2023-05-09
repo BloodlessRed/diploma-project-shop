@@ -38,187 +38,201 @@
         </td>
         <td class="amount-cell">
           <div class="counter-wrapper">
-            <div class="custom-button" @click="addToCart(itemId)"><span>+</span></div>
+            <div class="custom-button" @click="addToCart(itemId)">
+              <span>+</span>
+            </div>
             <div class="product-counter">
               {{ getProductFromCart(itemId).amount }}
             </div>
-            <div class="custom-button" @click="removeFromCart(itemId)"><span>-</span></div>
+            <div class="custom-button" @click="removeFromCart(itemId)">
+              <span>-</span>
+            </div>
           </div>
         </td>
         <td>
-          {{
-            shoppingCart.formatPrice(
-            getProductFromCart(itemId).amount *
-            getProductFromCart(itemId).product.price
-            )
-          }}
+          <b>
+            {{
+              shoppingCart.formatPrice(
+                getProductFromCart(itemId).amount *
+                  getProductFromCart(itemId).product.price
+              )
+            }}
 
-          rub
+            rub
+          </b>
         </td>
       </tr>
     </table>
-    <div class="client-info">
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title"
-            >Организационная форма<span class="mandatory-asterisk"
-              >*</span
-            ></label
-          >
-          <select class="select-style none-important">
-            <option value="ООО">ООО</option>
-            <option value="ОАО">ОАО</option>
-            <option value="ЗАО">ЗАО</option>
-          </select>
+    <div class="receipt-info">
+      <div class="client-info">
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title"
+              >Организационная форма<span class="mandatory-asterisk"
+                >*</span
+              ></label
+            >
+            <select class="select-style none-important">
+              <option value="ООО">ООО</option>
+              <option value="ОАО">ОАО</option>
+              <option value="ЗАО">ЗАО</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title">
-            Организация
-            <span class="mandatory-asterisk">*</span></label
-          >
-          <input
-            name="customf[company][value]"
-            value=""
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title">
-            ИНН
-            <span class="mandatory-asterisk">*</span></label
-          >
-          <input
-            name="customf[inn][value]"
-            value=""
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title"
-            >ФИО <span class="mandatory-asterisk">*</span></label
-          >
-          <input
-            v-model="fullName"
-            name="customf[name][value]"
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title"
-            >Телефон <span class="mandatory-asterisk">*</span></label
-          >
-          <input
-            name="customf[phone][value]"
-            value=""
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title">Эл. почта</label>
-          <input
-            name="customf[email][value]"
-            value=""
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title">Город / Населенный пункт</label>
-          <input
-            name="customf[city][value]"
-            value=""
-            maxlength="255"
-            size="50"
-            data-oneline=""
-            type="text"
-            class="inp"
-          />
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title active">Адрес доставки</label>
-          <textarea
-            cols="501"
-            rows="6"
-            name="customf[address][value]"
-            data-oneline=""
-            placeholder="Индекс, область, населенный пункт, улица, дом, квартира"
-            class="inp"
-          ></textarea>
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title">Комментарий</label>
-          <textarea
-            cols="501"
-            rows="6"
-            name="customf[comments][value]"
-            data-oneline=""
-            class="inp"
-          ></textarea>
-        </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <label class="field-title active">Загрузить карту партнера</label>
-          <div class="file-field">
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title">
+              Организация
+              <span class="mandatory-asterisk">*</span></label
+            >
             <input
-              name="customfile_Загрузить карту партнера"
+              name="customf[company][value]"
               value=""
-              type="file"
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
             />
           </div>
         </div>
-      </div>
-      <div class="input-field-wrapper">
-        <div class="separator">
-          <div class="politika left">
-            Отправляя форму, вы соглашаетесь<br />
-            c
-            <a target="_blank" href="/system/politika/"
-              >политикой конфиденциальности</a
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title">
+              ИНН
+              <span class="mandatory-asterisk">*</span></label
             >
+            <input
+              name="customf[inn][value]"
+              value=""
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title"
+              >ФИО <span class="mandatory-asterisk">*</span></label
+            >
+            <input
+              v-model="fullName"
+              name="customf[name][value]"
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title"
+              >Телефон <span class="mandatory-asterisk">*</span></label
+            >
+            <input
+              name="customf[phone][value]"
+              value=""
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title">Эл. почта</label>
+            <input
+              name="customf[email][value]"
+              value=""
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title">Город / Населенный пункт</label>
+            <input
+              name="customf[city][value]"
+              value=""
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title active">Адрес доставки</label>
+            <textarea
+              cols="501"
+              rows="6"
+              name="customf[address][value]"
+              data-oneline=""
+              placeholder="Индекс, область, населенный пункт, улица, дом, квартира"
+              class="inp"
+            ></textarea>
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title">Комментарий</label>
+            <textarea
+              cols="501"
+              rows="6"
+              name="customf[comments][value]"
+              data-oneline=""
+              class="inp"
+            ></textarea>
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title active">Загрузить карту партнера</label>
+            <div class="file-field">
+              <input
+                name="customfile_Загрузить карту партнера"
+                value=""
+                type="file"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <div class="politika left">
+              Отправляя форму, вы соглашаетесь<br />
+              c
+              <a target="_blank" href="/system/politika/"
+                >политикой конфиденциальности</a
+              >
+            </div>
           </div>
         </div>
       </div>
-      <input
-        type="submit"
-        @click="generateCommercialOffer()"
-        value="Получить коммерческое предложение"
-      />
+      <div class="receipt-price">
+        <div class="sum-section">
+          <span>Итого:</span>
+          <span>{{ shoppingCart.formatPrice(totalSum) }} rub</span>
+        </div>
+        <input
+          type="submit"
+          @click="generateCommercialOffer()"
+          value="Получить коммерческое предложение"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -243,7 +257,7 @@ export default defineComponent({
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
-      totalSum: 0,
+      totalSum: useShoppingCartStore().totalSum,
     };
   },
   methods: {
@@ -260,11 +274,13 @@ export default defineComponent({
         this.getProductFromCart(prodId);
       this.shoppingCart.addToCart(retrievedProduct.product);
     },
-    removeFromCart(prodId:number){
-      let retrievedProduct: ShoppingCartProduct = this.getProductFromCart(prodId);
-      this.shoppingCart.removeFromCart(retrievedProduct.product)
+    removeFromCart(prodId: number) {
+      let retrievedProduct: ShoppingCartProduct =
+        this.getProductFromCart(prodId);
+      this.shoppingCart.removeFromCart(retrievedProduct.product);
     },
     async generateCommercialOffer() {
+      console.log("total sum ", this.totalSum);
       let bearer;
       let origHeader = {
         alg: "HS256",
@@ -322,7 +338,7 @@ export default defineComponent({
           let docLink: Promise<string> = axios
             .get(data.response, { responseType: "blob" })
             .then((response) => {
-              console.log(response)
+              console.log(response);
               const blob = new Blob([response.data], {
                 type: "application/pdf",
               });
@@ -366,17 +382,6 @@ export default defineComponent({
         productSum: value.product.price * value.amount,
         photo: "stub",
       });
-      this.totalSum = this.totalSum + value.product.price * value.amount;
-      axios
-        .get(`../img/DFL-Nutrunners.svg`, {
-          headers: {
-            "Content-Type": " text/html",
-          },
-        })
-        .then((res) => {
-          return res.data;
-        })
-        .then((data) => {});
       fetch(`../img/${value.product.img}-Nutrunners.svg`)
         .then((res) => {
           return res.blob();
@@ -393,8 +398,8 @@ export default defineComponent({
           reader.readAsDataURL(blob);
         });
     });
-    console.log("KEY ",this.shoppingCart.cart.keys)
-    console.log("CURRENT PRODUCTS ",products)
+    console.log("KEY ", this.shoppingCart.cart.keys);
+    console.log("CURRENT PRODUCTS ", products);
     this.productsForCO = products;
   },
 });
@@ -410,10 +415,10 @@ export default defineComponent({
   height: 30px;
   text-align: center;
   border: 0;
-  font-weight: 500;
+  font-weight: 500px;
   background: rgba(0, 0, 0, 0.03);
 }
-.counter-wrapper{
+.counter-wrapper {
   display: flex;
   justify-content: center;
 }
@@ -421,18 +426,31 @@ export default defineComponent({
   padding: 5px 10px;
 }
 td > img {
-  width: 150px;
+  width: 50%;
+  margin: 10px 0 ;
 }
 .cart-main-content {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 80%;
+  align-self: center;
   flex-grow: 1;
   justify-content: center;
 }
 .cart-items > tr:first-of-type {
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(122, 122, 122, 0.1);
+}
+.cart-items  > tr {
+  border-top: 1px solid rgba(0, 0, 0, 0.1); 
+  display: flex;
+  align-items: center;
+}
+.cart-items  > tr > th, td {
+ flex: 1;
+}
+.cart-items  > tr > th:nth-of-type(3), td:nth-of-type(3) {
+ flex: 3;
 }
 .cart-items {
   border-collapse: collapse;
@@ -442,25 +460,49 @@ td > img {
 }
 .cart-items th,
 td {
+  
   text-align: center;
 }
 .amount-cell {
   width: 13%;
 }
-.client-info {
-  margin: 20px 0;
+.receipt-info {
   display: flex;
-  flex-direction: column;
+  justify-content: space-evenly;
   align-self: center;
   width: 70%;
+  margin: 20px 0;
 }
-.client-info > input {
+.receipt-price {
+  display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 30%;
+    margin: 0 0 20% 5%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.receipt-price > input {
+  font-size: 18px;
   background-color: #2e75b6;
   color: #ffffff;
   border: 0;
-  height: 20%;
-  width: 50%;
+  border-radius: 4px;
+  padding: 2%;
+}
+.client-info {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
   align-self: center;
+  flex: 1;
+}
+.sum-section span{
+  font-size: 18px;
+  font-weight: bolder;
+}
+.sum-section span:first-of-type{
+  margin: 0 100px 0 0;
 }
 .product-name-wrapper {
   padding: 0 10px;
@@ -489,7 +531,7 @@ select {
 }
 .field-title {
   margin: 0 20px;
-  width: 15%;
+  width: 25%;
   text-align: end;
 }
 </style>
