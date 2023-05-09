@@ -225,7 +225,7 @@
       <div class="receipt-price">
         <div class="sum-section">
           <span>Итого:</span>
-          <span>{{ shoppingCart.formatPrice(totalSum) }} rub</span>
+          <span>{{ shoppingCart.formatPrice(computed_sum) }} rub</span>
         </div>
         <input
           type="submit"
@@ -251,13 +251,19 @@ export default defineComponent({
       supabase,
     };
   },
+  computed:{
+    computed_sum(): number{
+      this.totalSum = this.shoppingCart.totalSum
+      return this.totalSum
+    }
+  },
   data() {
     return {
       fullName: "",
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
-      totalSum: useShoppingCartStore().totalSum,
+      totalSum: 0,
     };
   },
   methods: {
@@ -369,6 +375,7 @@ export default defineComponent({
     },
   },
   async mounted() {
+    this.totalSum = this.shoppingCart.totalSum;
     let products: unknown[] = [];
     let image = this.$refs.prodPic;
     let imgBase64;
@@ -424,6 +431,11 @@ export default defineComponent({
 }
 .custom-button {
   padding: 5px 10px;
+}
+.custom-button > span{
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 td > img {
   width: 50%;
