@@ -40,8 +40,8 @@ export default defineComponent({
   data() {
     return {
       imgSrc: "logo.svg",
-      suppliers: ["Поставщик1", "Поставщик2"],
-      categories: ["nutrunners", "SecondaryMarket"],
+      suppliers: ["Поставщик 1", "Поставщик 2"],
+      categories: ["Категория 1", "Категория 2"],
       serviceCenters: ["Сервисный центр 1", "Сервисный центр 2"],
     };
   },
