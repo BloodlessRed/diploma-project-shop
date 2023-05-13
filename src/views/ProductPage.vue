@@ -43,7 +43,7 @@
           <router-link
             :to="{
               name: 'Product',
-              params: { category: item.category, product_id: item.vendorCode },
+              params: { product_id: item.vendorCode },
             }"
           >
             <div class="custom-button">

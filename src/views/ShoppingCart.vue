@@ -341,7 +341,7 @@ export default defineComponent({
           return res.data;
         })
         .then((data) => {
-          let docLink: Promise<string> = axios
+          let docLink: Promise<Blob> = axios
             .get(data.response, { responseType: "blob" })
             .then((response) => {
               console.log(response);
@@ -353,12 +353,18 @@ export default defineComponent({
               link.download = "Invoice_Newton_M";
               link.click();
               URL.revokeObjectURL(link.href);
-              return link.href;
+              return blob;
             });
-          return docLink;
+          return docLink
         })
         .then((docLink) => {
-          this.saveOrderToDB(docLink);
+          const fr = new FileReader()
+          fr.onload = ()=>{
+            let pdfString: string = fr.result?.toString() == undefined ? "" : fr.result.toString()
+            console.log("SAVED STRING IS ", pdfString)
+            this.saveOrderToDB(pdfString)
+          }
+          fr.readAsDataURL(docLink)
         });
     },
     async saveOrderToDB(dockLink: string) {
