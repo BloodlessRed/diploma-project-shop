@@ -333,16 +333,7 @@ export default defineComponent({
       let expirationDate = new Date(dateForCO);
       expirationDate.setMonth(expirationDate.getMonth() + 1);
       let manager = await this.supabase
-        .from("least_busy_manager")
-        .select("manager_id,full_name,job_title")
-        .single()
-        .then((leastBusyManager) => {
-          console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
-          return leastBusyManager.data;
-        });
-      if (manager == null) {
-        manager = await this.supabase
-          .from("Managers")
+          .from("managers_without_orders")
           .select("manager_id, full_name, job_title")
           .limit(1)
           .single()
@@ -350,7 +341,17 @@ export default defineComponent({
             console.log(value);
             return value.data;
           });
-        console.log("Now we definitely have a manager ", manager);
+          console.log("Now we have a manager ", manager);
+      if (manager == null) {
+        manager = await this.supabase
+        .from("least_busy_manager")
+        .select("manager_id,full_name,job_title")
+        .single()
+        .then((leastBusyManager) => {
+          console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
+          return leastBusyManager.data;
+        });
+        
       }
       if (manager == null) {
         alert("Что-то пошло не так! Перезагрузите страницу");
@@ -445,9 +446,9 @@ export default defineComponent({
           });
         let orderToProductsRows = this.productsForCO.map((element) => {
           return {
-            "orderId": orderId?.order_id,
-            "productId": element.prod_id,
-            "amount": element.productSum
+            order_id: orderId?.order_id,
+            product_id: element.prod_for_db,
+            amount: element.amount
           }
         });
         console.log(orderToProductsRows)
@@ -464,7 +465,8 @@ export default defineComponent({
     let imgBase64;
     await this.shoppingCart.cart.forEach((value, key) => {
       products.push({
-        prod_id: value.product.id,
+        prod_id: key+1,
+        prod_for_db: value.product.id,
         amount: value.amount,
         vendorCode: value.product.vendorCode,
         description: value.product.description,
