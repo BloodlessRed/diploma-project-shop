@@ -2,8 +2,8 @@
   <div class="login-container">
     <form>
       <div class="form-group">
-        <label for="username" class="label">Username:</label>
-        <input type="text" id="username" v-model="username" />
+        <label for="username" class="label">Email:</label>
+        <input type="text" id="username" v-model="email" />
       </div>
       <div class="form-group">
         <label for="password" class="label">Password:</label>
@@ -17,23 +17,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { defineComponent, inject } from "vue";
 
 export default defineComponent({
+  setup() {
+    const supabase: SupabaseClient | undefined = inject("supabase");
+    return {
+      supabase,
+    };
+  },
   data() {
     return {
-      username: "",
+      email: "",
       password: "",
     };
   },
   methods: {
-    login() {
-      // Your login logic goes here, for example:
-      if (this.username === "user" && this.password === "password") {
-        alert("Login successful!");
-        this.$router.push({name:'ManagersPage', params:{manager:this.username}})
-      } else {
-        alert("Invalid credentials!");
+    async login() {
+      if (this.supabase != undefined) {
+        await this.supabase.auth.signInWithPassword({
+          email:this.email,
+          password:this.password
+        })
+        let currentUser = await this.supabase.auth.getUser().then((val)=>{return val.data.user})
+        if(currentUser != null && currentUser.user_metadata.role == 'manager'){
+          this.$router.push({name:'ManagersPage', params:{manager:currentUser.email}})
+        }
       }
     },
   },

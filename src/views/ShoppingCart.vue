@@ -281,7 +281,7 @@ export default defineComponent({
       address: "",
       comment: "",
       shoppingCart: useShoppingCartStore(),
-      productsForCO: [] as unknown[],
+      productsForCO: [] as any[],
       base64Images: new Map<number, string>(),
       totalSum: 0,
     };
@@ -306,7 +306,10 @@ export default defineComponent({
       this.shoppingCart.removeFromCart(retrievedProduct.product);
     },
     async generateCommercialOffer() {
-      console.log("total sum ", this.totalSum);
+      if (this.supabase == undefined) {
+        alert("Что-то пошло не так! Перезагрузите страницу");
+        return;
+      }
       let bearer;
       let origHeader = {
         alg: "HS256",
@@ -329,15 +332,39 @@ export default defineComponent({
       let dateForCO = new Date(Date.now());
       let expirationDate = new Date(dateForCO);
       expirationDate.setMonth(expirationDate.getMonth() + 1);
+      let manager = await this.supabase
+        .from("least_busy_manager")
+        .select("manager_id,full_name,job_title")
+        .single()
+        .then((leastBusyManager) => {
+          console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
+          return leastBusyManager.data;
+        });
+      if (manager == null) {
+        manager = await this.supabase
+          .from("Managers")
+          .select("manager_id, full_name, job_title")
+          .limit(1)
+          .single()
+          .then((value) => {
+            console.log(value);
+            return value.data;
+          });
+        console.log("Now we definitely have a manager ", manager);
+      }
+      if (manager == null) {
+        alert("Что-то пошло не так! Перезагрузите страницу");
+        return;
+      }
       let preparedData = {
         docId: "001",
         currentDate: dateForCO.toLocaleString().split(",")[0],
         expirationDate: expirationDate.toLocaleString().split(",")[0],
         fullName: this.fullName,
+        manager: manager.full_name,
+        job_title: manager.job_title,
         products: this.productsForCO,
       };
-      console.log(preparedData);
-      console.log(bearer);
       await axios
         .post(
           "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
@@ -383,12 +410,12 @@ export default defineComponent({
             let pdfString: string =
               fr.result?.toString() == undefined ? "" : fr.result.toString();
             console.log("SAVED STRING IS ", pdfString);
-            this.saveOrderToDB(pdfString);
+            this.saveOrderToDB(pdfString, manager);
           };
           fr.readAsDataURL(docLink);
         });
     },
-    async saveOrderToDB(dockLink: string) {
+    async saveOrderToDB(dockLink: string, manager: any) {
       if (this.supabase != undefined) {
         let note = {
           orgType: this.orgType,
@@ -401,15 +428,30 @@ export default defineComponent({
           address: this.address,
           comment: this.comment,
         };
-        await this.supabase
+        let orderId = await this.supabase
           .from("Orders")
-          .insert([{ overall_price: this.totalSum, document: dockLink, note:JSON.stringify(note) }])
-          .select('order_id')
+          .insert([
+            {
+              overall_price: this.totalSum,
+              document: dockLink,
+              note: JSON.stringify(note),
+              manager_id: manager.manager_id,
+            },
+          ])
+          .select("order_id")
           .single()
           .then((value) => {
-            console.log("After inserting data into Order table we get:", value.data);
+            return value.data;
           });
-        
+        let orderToProductsRows = this.productsForCO.map((element) => {
+          return {
+            "orderId": orderId?.order_id,
+            "productId": element.prod_id,
+            "amount": element.productSum
+          }
+        });
+        console.log(orderToProductsRows)
+        await this.supabase.from("OrderToProducts").insert(orderToProductsRows).then((value)=>console.log(value));
       } else {
         console.log("Доступ к БД закрыт");
       }
@@ -422,7 +464,7 @@ export default defineComponent({
     let imgBase64;
     await this.shoppingCart.cart.forEach((value, key) => {
       products.push({
-        prod_id: key + 1,
+        prod_id: value.product.id,
         amount: value.amount,
         vendorCode: value.product.vendorCode,
         description: value.product.description,
