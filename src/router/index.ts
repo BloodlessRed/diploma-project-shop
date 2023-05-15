@@ -45,7 +45,7 @@ const router = createRouter({
       component:LoginPage
     },
     {
-      path:"/managers_page",
+      path:"/user_account/manager/:manager",
       name:"ManagersPage",
       component:ManagersPage
     }

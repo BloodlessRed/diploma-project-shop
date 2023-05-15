@@ -109,6 +109,7 @@ img {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  margin-right: 5px;
 }
 .manufacturer-logo {
   width: auto;

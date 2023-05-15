@@ -22,7 +22,9 @@
           <router-link
             :to="{
               name: 'Product',
-              params: { product_id: getProductFromCart(itemId).product.id },
+              params: {
+                product_id: getProductFromCart(itemId).product.vendorCode,
+              },
             }"
             >{{ getProductFromCart(itemId).product.vendorCode }}</router-link
           >
@@ -72,7 +74,11 @@
                 >*</span
               ></label
             >
-            <select class="select-style none-important">
+            <select
+              class="select-style none-important"
+              required
+              v-model="orgType"
+            >
               <option value="ООО">ООО</option>
               <option value="ОАО">ОАО</option>
               <option value="ЗАО">ЗАО</option>
@@ -87,12 +93,13 @@
             >
             <input
               name="customf[company][value]"
-              value=""
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
+              v-model="orgName"
+              required
             />
           </div>
         </div>
@@ -104,12 +111,13 @@
             >
             <input
               name="customf[inn][value]"
-              value=""
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
+              v-model="taxId"
+              required
             />
           </div>
         </div>
@@ -120,12 +128,28 @@
             >
             <input
               v-model="fullName"
-              name="customf[name][value]"
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
+              required
+            />
+          </div>
+        </div>
+        <div class="input-field-wrapper">
+          <div class="separator">
+            <label class="field-title"
+              >Эл. почта <span class="mandatory-asterisk">*</span></label
+            >
+            <input
+              maxlength="255"
+              size="50"
+              data-oneline=""
+              type="text"
+              class="inp"
+              v-model="email"
+              required
             />
           </div>
         </div>
@@ -135,27 +159,13 @@
               >Телефон <span class="mandatory-asterisk">*</span></label
             >
             <input
-              name="customf[phone][value]"
-              value=""
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
-            />
-          </div>
-        </div>
-        <div class="input-field-wrapper">
-          <div class="separator">
-            <label class="field-title">Эл. почта</label>
-            <input
-              name="customf[email][value]"
-              value=""
-              maxlength="255"
-              size="50"
-              data-oneline=""
-              type="text"
-              class="inp"
+              v-model="phone"
+              required
             />
           </div>
         </div>
@@ -164,12 +174,12 @@
             <label class="field-title">Город / Населенный пункт</label>
             <input
               name="customf[city][value]"
-              value=""
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
+              v-model="city"
             />
           </div>
         </div>
@@ -183,6 +193,7 @@
               data-oneline=""
               placeholder="Индекс, область, населенный пункт, улица, дом, квартира"
               class="inp"
+              v-model="address"
             ></textarea>
           </div>
         </div>
@@ -195,6 +206,7 @@
               name="customf[comments][value]"
               data-oneline=""
               class="inp"
+              v-model="comment"
             ></textarea>
           </div>
         </div>
@@ -216,7 +228,7 @@
               Отправляя форму, вы соглашаетесь<br />
               c
               <a target="_blank" href="/system/politika/"
-                >политикой конфиденциальности</a
+                >кодексом деловой этики компании</a
               >
             </div>
           </div>
@@ -251,15 +263,23 @@ export default defineComponent({
       supabase,
     };
   },
-  computed:{
-    computed_sum(): number{
-      this.totalSum = this.shoppingCart.totalSum
-      return this.totalSum
-    }
+  computed: {
+    computed_sum(): number {
+      this.totalSum = this.shoppingCart.totalSum;
+      return this.totalSum;
+    },
   },
   data() {
     return {
+      orgType: "",
+      orgName: "",
+      taxId: "",
       fullName: "",
+      email: "",
+      phone: "",
+      city: "",
+      address: "",
+      comment: "",
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as unknown[],
       base64Images: new Map<number, string>(),
@@ -293,12 +313,12 @@ export default defineComponent({
         typ: "JWT",
       };
       let origPlaceholder = {
-        iss: "2f54bb29282370c33a91a939266213ec83ab13cc88dcb2507307db83cc4e6719",
-        sub: "mms28042001@gmail.com",
+        iss: "a9becc0e2dedc27a35a1c0b8e40efc185971bf0801c64bcd0b070c2087b55cf4",
+        sub: "soshtau@gmail.com",
         exp: new Date(Date.now() + 10000).getTime(),
       };
       let API_SECRET_CODE =
-        "19b3212fa4c0a6c7c930285bf8bf7f363bbbe0689597f7c6a605a0d8bd085e11";
+        "c27cc38d04f65d1a92ccafbda06a065a49730820bde05879f95ecae3d14f898d";
       await new signingTool(origPlaceholder)
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime("1h")
@@ -323,7 +343,7 @@ export default defineComponent({
           "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
           {
             template: {
-              id: "614636",
+              id: "651733",
               data: preparedData,
             },
             format: "pdf",
@@ -355,26 +375,41 @@ export default defineComponent({
               URL.revokeObjectURL(link.href);
               return blob;
             });
-          return docLink
+          return docLink;
         })
         .then((docLink) => {
-          const fr = new FileReader()
-          fr.onload = ()=>{
-            let pdfString: string = fr.result?.toString() == undefined ? "" : fr.result.toString()
-            console.log("SAVED STRING IS ", pdfString)
-            this.saveOrderToDB(pdfString)
-          }
-          fr.readAsDataURL(docLink)
+          const fr = new FileReader();
+          fr.onload = () => {
+            let pdfString: string =
+              fr.result?.toString() == undefined ? "" : fr.result.toString();
+            console.log("SAVED STRING IS ", pdfString);
+            this.saveOrderToDB(pdfString);
+          };
+          fr.readAsDataURL(docLink);
         });
     },
     async saveOrderToDB(dockLink: string) {
       if (this.supabase != undefined) {
+        let note = {
+          orgType: this.orgType,
+          orgName: this.orgName,
+          taxId: this.taxId,
+          fullName: this.fullName,
+          email: this.email,
+          phone: this.phone,
+          city: this.city,
+          address: this.address,
+          comment: this.comment,
+        };
         await this.supabase
           .from("Orders")
-          .insert([{ overall_price: this.totalSum, document: dockLink }])
+          .insert([{ overall_price: this.totalSum, document: dockLink, note:JSON.stringify(note) }])
+          .select('order_id')
+          .single()
           .then((value) => {
-            console.log("After inserting data into Order table we get:", value);
+            console.log("After inserting data into Order table we get:", value.data);
           });
+        
       } else {
         console.log("Доступ к БД закрыт");
       }
@@ -387,7 +422,7 @@ export default defineComponent({
     let imgBase64;
     await this.shoppingCart.cart.forEach((value, key) => {
       products.push({
-        prod_id: key,
+        prod_id: key + 1,
         amount: value.amount,
         vendorCode: value.product.vendorCode,
         description: value.product.description,
@@ -438,14 +473,14 @@ export default defineComponent({
 .custom-button {
   padding: 5px 10px;
 }
-.custom-button > span{
+.custom-button > span {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
 td > img {
   width: 50%;
-  margin: 10px 0 ;
+  margin: 10px 0;
 }
 .cart-main-content {
   display: flex;
@@ -459,16 +494,18 @@ td > img {
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(122, 122, 122, 0.1);
 }
-.cart-items  > tr {
-  border-top: 1px solid rgba(0, 0, 0, 0.1); 
+.cart-items > tr {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
 }
-.cart-items  > tr > th, td {
- flex: 1;
+.cart-items > tr > th,
+td {
+  flex: 1;
 }
-.cart-items  > tr > th:nth-of-type(3), td:nth-of-type(3) {
- flex: 3;
+.cart-items > tr > th:nth-of-type(3),
+td:nth-of-type(3) {
+  flex: 3;
 }
 .cart-items {
   border-collapse: collapse;
@@ -478,7 +515,6 @@ td > img {
 }
 .cart-items th,
 td {
-  
   text-align: center;
 }
 .amount-cell {
@@ -493,12 +529,12 @@ td {
 }
 .receipt-price {
   display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 30%;
-    margin: 0 0 20% 5%;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 30%;
+  margin: 0 0 20% 5%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 .receipt-price > input {
   font-size: 18px;
@@ -515,11 +551,11 @@ td {
   align-self: center;
   flex: 1;
 }
-.sum-section span{
+.sum-section span {
   font-size: 18px;
   font-weight: bolder;
 }
-.sum-section span:first-of-type{
+.sum-section span:first-of-type {
   margin: 0 100px 0 0;
 }
 .product-name-wrapper {
