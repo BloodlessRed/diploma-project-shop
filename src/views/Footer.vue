@@ -2,7 +2,7 @@
   <div class="footer-wrapper">
     <div class="footer-main-content">
       <div class="logo">
-        <img :src="`../img/logo.svg`" />
+        <img :src="`/img/logo.svg`" />
       </div>
       <div class="site-content">
         <p>Поставщики</p>
