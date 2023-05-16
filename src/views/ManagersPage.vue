@@ -13,7 +13,7 @@
         <li v-for="order in orders" :key="order.id">
           <p>Order ID: {{ order.id }}</p>
           <p>Client Name: {{ order.clientCompany }}</p>
-          <p>Product: {{ order.products }}</p>
+          <p>Product: <span v-for="product in order.products">{{ product }}</span></p>
           <p>Revenue: {{ order.revenue }}</p>
           <a :href="order.document">Commercial offer</a>
           <button v-if="true" @click="createAccount(order.clientCompany)">
@@ -46,7 +46,7 @@ export default defineComponent({
           id: 1,
           clientCompany: "Alice Brown",
           document: "Laptop",
-          products: "",
+          products: [] as any[],
           revenue: 1000,
         },
       ],
@@ -59,6 +59,7 @@ export default defineComponent({
     },
     signOut(){
       this.supabase?.auth.signOut()
+      this.$router.push({name:"Login"})
     }
   },
   async mounted() {
@@ -113,7 +114,7 @@ export default defineComponent({
       this.orders.push({
         id: element.order_id,
         clientCompany: clientsNote.orgType + " " + clientsNote.orgName,
-        products: products.toString(),
+        products: products,
         document: link,
         revenue: element.overall_price,
       });

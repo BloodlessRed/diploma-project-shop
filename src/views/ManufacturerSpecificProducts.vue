@@ -122,7 +122,7 @@ export default defineComponent({
 .product-specific-wrapper {
   display: flex;
   /* justify-content: stretch; */
-  padding: 10px 50px;
+  width: 80%;
 }
 
 .products {

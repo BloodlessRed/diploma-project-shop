@@ -59,16 +59,13 @@ export default defineComponent({
 </script>
 <style scoped>
 
-.main-wrapper * {
-  width: 100%;
-}
-
 img {
   max-width: fit-content;
 }
 
 .introduction {
   display: flex;
+  width: 100%;
 }
 
 .introduction:first-child {
@@ -91,6 +88,7 @@ img {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  width: 100%;
   max-height: 10vh;
 }
 

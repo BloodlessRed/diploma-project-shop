@@ -71,7 +71,6 @@ a{
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 0px 220px 4% 220px;
 }
 </style>

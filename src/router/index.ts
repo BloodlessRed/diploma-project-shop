@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import ManufacturerSpecificProducts from '../views/ManufacturerSpecificProducts.vue';
 import MainPage from '../views/MainPage.vue';
 import ProductPage from '../views/ProductPage.vue';
@@ -28,11 +28,11 @@ const router = createRouter({
       name:"Product", 
       component: ProductPage, 
       props:true,
-      beforeEnter:(to,from,enter)=>{
-        if(to.params.product_id.length > 0){
-          enter()
-        }
-      }
+      // beforeEnter:(to,from,enter)=>{
+      //   if(to.params.product_id.length > 0){
+      //     enter()
+      //   }
+      // }
     },
     {
       path:"/cart",
@@ -45,7 +45,7 @@ const router = createRouter({
       component:LoginPage
     },
     {
-      path:"/user_account/manager/:manager",
+      path:"/user_account/manager/:manager?",
       name:"ManagersPage",
       component:ManagersPage
     }

@@ -65,7 +65,7 @@
         </td>
       </tr>
     </table>
-    <div class="receipt-info">
+    <form class="receipt-info" @submit="generateCommercialOffer($event)">
       <div class="client-info">
         <div class="input-field-wrapper">
           <div class="separator">
@@ -87,11 +87,12 @@
         </div>
         <div class="input-field-wrapper">
           <div class="separator">
-            <label class="field-title">
-              Организация
-              <span class="mandatory-asterisk">*</span></label
-            >
+            <label for="org_name_id" class="field-title">
+              Организация <span class="mandatory-asterisk">*</span>
+              <!-- <span class="mandatory-asterisk">*</span> -->
+            </label>
             <input
+              id="org_name_id"
               name="customf[company][value]"
               maxlength="255"
               size="50"
@@ -241,11 +242,10 @@
         </div>
         <input
           type="submit"
-          @click="generateCommercialOffer()"
           value="Получить коммерческое предложение"
         />
       </div>
-    </div>
+    </form>
   </div>
 </template>
 <script lang="ts">
@@ -305,10 +305,22 @@ export default defineComponent({
         this.getProductFromCart(prodId);
       this.shoppingCart.removeFromCart(retrievedProduct.product);
     },
-    async generateCommercialOffer() {
+    async generateCommercialOffer(event:Event) {
+      event.preventDefault()
       if (this.supabase == undefined) {
         alert("Что-то пошло не так! Перезагрузите страницу");
         return;
+      }
+      if (
+        !(this.orgType &&
+        this.orgName &&
+        this.taxId &&
+        this.fullName &&
+        this.email &&
+        this.phone)
+      ) {
+
+        alert("Одно из обязательных полей не было заполнено. Заполните все необходимые поля")
       }
       let bearer;
       let origHeader = {
@@ -333,25 +345,24 @@ export default defineComponent({
       let expirationDate = new Date(dateForCO);
       expirationDate.setMonth(expirationDate.getMonth() + 1);
       let manager = await this.supabase
-          .from("managers_without_orders")
-          .select("manager_id, full_name, job_title")
-          .limit(1)
-          .single()
-          .then((value) => {
-            console.log(value);
-            return value.data;
-          });
-          console.log("Now we have a manager ", manager);
+        .from("managers_without_orders")
+        .select("manager_id, full_name, job_title")
+        .limit(1)
+        .single()
+        .then((value) => {
+          console.log(value);
+          return value.data;
+        });
+      console.log("Now we have a manager ", manager);
       if (manager == null) {
         manager = await this.supabase
-        .from("least_busy_manager")
-        .select("manager_id,full_name,job_title")
-        .single()
-        .then((leastBusyManager) => {
-          console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
-          return leastBusyManager.data;
-        });
-        
+          .from("least_busy_manager")
+          .select("manager_id,full_name,job_title")
+          .single()
+          .then((leastBusyManager) => {
+            console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
+            return leastBusyManager.data;
+          });
       }
       if (manager == null) {
         alert("Что-то пошло не так! Перезагрузите страницу");
@@ -448,11 +459,14 @@ export default defineComponent({
           return {
             order_id: orderId?.order_id,
             product_id: element.prod_for_db,
-            amount: element.amount
-          }
+            amount: element.amount,
+          };
         });
-        console.log(orderToProductsRows)
-        await this.supabase.from("OrderToProducts").insert(orderToProductsRows).then((value)=>console.log(value));
+        console.log(orderToProductsRows);
+        await this.supabase
+          .from("OrderToProducts")
+          .insert(orderToProductsRows)
+          .then((value) => console.log(value));
       } else {
         console.log("Доступ к БД закрыт");
       }
@@ -463,9 +477,9 @@ export default defineComponent({
     let products: unknown[] = [];
     let image = this.$refs.prodPic;
     let imgBase64;
-    await this.shoppingCart.cart.forEach((value, key) => {
+    this.shoppingCart.cart.forEach((value, key) => {
       products.push({
-        prod_id: key+1,
+        prod_id: key + 1,
         prod_for_db: value.product.id,
         amount: value.amount,
         vendorCode: value.product.vendorCode,

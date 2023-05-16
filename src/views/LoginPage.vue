@@ -39,7 +39,7 @@ export default defineComponent({
         await this.supabase.auth.signInWithPassword({
           email:this.email,
           password:this.password
-        })
+        }).then(val=>console.log(val))
         let currentUser = await this.supabase.auth.getUser().then((val)=>{return val.data.user})
         if(currentUser != null && currentUser.user_metadata.role == 'manager'){
           this.$router.push({name:'ManagersPage', params:{manager:currentUser.email}})

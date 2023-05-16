@@ -180,9 +180,10 @@ button {
   justify-content: center;
   width: 100%;
   height: 67px;
-  left: 0px;
-  top: 52px;
   background: #2e75b6;
+}
+.line > * {
+  margin: 0 5px;
 }
 .logo {
   margin-right: -15%;
