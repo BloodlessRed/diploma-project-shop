@@ -5,6 +5,7 @@
       <p>Name: {{ name }}</p>
       <p>Email: {{ email }}</p>
       <p>Phone: {{ phone }}</p>
+      <button @click="signOut()">Sign out</button>
     </div>
     <div class="block2">
       <h1>Current Orders</h1>
@@ -56,6 +57,9 @@ export default defineComponent({
       // write your logic to create a new account for the client
       alert(`Creating account for ${clientName}`);
     },
+    signOut(){
+      this.supabase?.auth.signOut()
+    }
   },
   async mounted() {
     if (this.supabase == undefined) {
