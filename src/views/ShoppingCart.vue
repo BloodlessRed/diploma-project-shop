@@ -346,7 +346,7 @@ export default defineComponent({
       expirationDate.setMonth(expirationDate.getMonth() + 1);
       let manager = await this.supabase
         .from("managers_without_orders")
-        .select("manager_id, full_name, job_title")
+        .select("manager_id, full_name, job_title,phone_num")
         .limit(1)
         .single()
         .then((value) => {
@@ -357,7 +357,7 @@ export default defineComponent({
       if (manager == null) {
         manager = await this.supabase
           .from("least_busy_manager")
-          .select("manager_id,full_name,job_title")
+          .select("manager_id,full_name,job_title,phone_num")
           .single()
           .then((leastBusyManager) => {
             console.log("YOUR MANAGER WILL BE: ", leastBusyManager.data);
@@ -375,6 +375,7 @@ export default defineComponent({
         fullName: this.fullName,
         manager: manager.full_name,
         job_title: manager.job_title,
+        phone_num:manager.phone_num,
         products: this.productsForCO,
       };
       await axios
