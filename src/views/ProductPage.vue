@@ -151,7 +151,7 @@ export default defineComponent({
       this.shoppingCart.addToCart(this.product);
     },
     downloadExplosionSchema(name: string) {
-      fetch("../explosion_schemas/" + name + ".pdf")
+      fetch("/explosion_schemas/" + name + ".pdf")
         .then((value) => {
           console.log(value);
           return value.blob();
