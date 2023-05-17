@@ -6,4 +6,3 @@ status = 200
 [[redirects]] 
 from = "/explosion_schemas/*" 
 to = "/explosion_schemas/:splat" 
-status = 200
