@@ -113,7 +113,7 @@ export default defineComponent({
       })
       .then(() => {
         console.log(this.product.vendorCode);
-        fetch("../explosion_schemas/" + this.product.vendorCode + ".pdf").then(
+        fetch("/explosion_schemas/" + this.product.vendorCode + ".pdf").then(
           (response) => {
             if (!(response.status >= 200 && response.status < 300)) {
               this.hasSchema = false;
