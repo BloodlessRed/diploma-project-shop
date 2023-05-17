@@ -78,7 +78,7 @@ export default defineComponent({
       product: new Product(),
       similarProducts: [] as Product[],
       shoppingCart: useShoppingCartStore(),
-      hasSchema: true,
+      hasSchema: false,
     };
   },
   async mounted() {
@@ -115,8 +115,8 @@ export default defineComponent({
         console.log(this.product.vendorCode);
         fetch("/explosion_schemas/" + this.product.vendorCode + ".pdf").then(
           (response) => {
-            if (!(response.status >= 200 && response.status < 300)) {
-              this.hasSchema = false;
+            if ((response.status >= 200 && response.status < 300)) {
+              this.hasSchema = true;
             }
           }
         );
