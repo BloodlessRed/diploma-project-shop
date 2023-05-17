@@ -115,6 +115,7 @@ export default defineComponent({
         console.log(this.product.vendorCode);
         fetch("/explosion_schemas/" + this.product.vendorCode + ".pdf").then(
           (response) => {
+            console.log(response)
             if (response.ok) {
               console.log("The object has a schema")
               this.hasSchema = true;
