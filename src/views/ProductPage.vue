@@ -115,11 +115,18 @@ export default defineComponent({
         console.log(this.product.vendorCode);
         fetch("/explosion_schemas/" + this.product.vendorCode + ".pdf").then(
           (response) => {
-            if ((response.status >= 200 && response.status < 300)) {
+            if (response.ok) {
+              console.log("The object has a schema")
               this.hasSchema = true;
+            }else{
+              throw new Error("File not found")
             }
           }
-        );
+        )
+        .catch(error=>{
+          console.log("no schema")
+          this.hasSchema=false
+        });
       });
     this.supabase
       .from("Products")
@@ -150,10 +157,10 @@ export default defineComponent({
       console.log(this.product);
       this.shoppingCart.addToCart(this.product);
     },
-    downloadExplosionSchema(name: string) {
-      fetch("/explosion_schemas/" + name + ".pdf")
+    async downloadExplosionSchema(name: string) {
+      await fetch("/explosion_schemas/" + name + ".pdf")
         .then((value) => {
-          console.log(value);
+          console.log("Explosion schema is ",value);
           return value.blob();
         })
         .then((blob) => {
@@ -164,7 +171,7 @@ export default defineComponent({
           link.click();
           window.URL.revokeObjectURL(url);
         })
-        .catch((error) => (this.hasSchema = false));
+        .catch((error) => {this.hasSchema = false});
     },
   },
 });
