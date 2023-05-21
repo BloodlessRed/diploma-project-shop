@@ -26,11 +26,12 @@
         @click="navigate('Login')"
         class="to-account"
       >
-        <img :src="`/img/account-stub.svg`" />
+      <img :src="`/img/to-account.svg`" />
+      <span>Войти</span>
       </div>
       <div v-else @click="navigate('ManagersPage')" class="to-account">
         <img :src="`/img/to-account.svg`" />
-        <span>{{ cmptd_user }}</span>
+        <span>{{ user.userInfo.full_name }}</span>
       </div>
       <router-link :to="{ name: 'ShoppingCart' }">
         <img src="/img/shopping-cart.svg" alt="shopping_cart_image" />
@@ -64,8 +65,7 @@ export default defineComponent({
     return {
       shoppingCart: useShoppingCartStore(),
       user: useCurrentUserStore(),
-      searchedProduct: "",
-      listener: "" as any,
+      searchedProduct: ""
     };
   },
   methods: {

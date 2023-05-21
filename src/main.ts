@@ -11,7 +11,6 @@ window.sessionStorage.clear
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
-
 const app = createApp(App)
 const supabaseUrl = "https://pamxsrdnxuqjelrudpca.supabase.co"
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhbXhzcmRueHVxamVscnVkcGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODI0MzI4NDEsImV4cCI6MTk5ODAwODg0MX0.OV31fqjnNfL-x5vptKOQf2IQdHl978jZjmIVz9dJuwg"

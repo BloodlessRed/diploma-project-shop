@@ -7,7 +7,9 @@
 <script lang="ts">
 import Header from "./views/Header.vue";
 import Footer from "./views/Footer.vue";
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { useCurrentUserStore } from "./stores/currentUser";
 export default defineComponent({
   components: {
     Header,

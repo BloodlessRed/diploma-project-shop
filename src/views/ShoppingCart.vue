@@ -1,6 +1,13 @@
 <template>
   <div class="cart-main-content">
-    <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true" color="#2e75b6" class="my-loader" z-index="3"/>
+    <loading
+      :active.sync="isLoading"
+      :can-cancel="false"
+      :is-full-page="true"
+      color="#2e75b6"
+      class="my-loader"
+      z-index="3"
+    />
 
     <table class="cart-items">
       <tr>
@@ -67,41 +74,23 @@
         </td>
       </tr>
     </table>
-    <form class="receipt-info" @submit="generateCommercialOffer($event)">
+    <form
+      class="receipt-info"
+      @submit="generateCommercialOffer($event)"
+    >
       <div class="client-info">
         <div class="input-field-wrapper">
           <div class="separator">
             <label class="field-title"
-              >Организационная форма<span class="mandatory-asterisk"
-                >*</span
-              ></label
+              >ФИО <span class="mandatory-asterisk">*</span></label
             >
-            <select
-              class="select-style none-important"
-              required
-              v-model="orgType"
-            >
-              <option value="ООО">ООО</option>
-              <option value="ОАО">ОАО</option>
-              <option value="ЗАО">ЗАО</option>
-            </select>
-          </div>
-        </div>
-        <div class="input-field-wrapper">
-          <div class="separator">
-            <label for="org_name_id" class="field-title">
-              Организация <span class="mandatory-asterisk">*</span>
-              <!-- <span class="mandatory-asterisk">*</span> -->
-            </label>
             <input
-              id="org_name_id"
-              name="customf[company][value]"
+              v-model="fullName"
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
-              v-model="orgName"
               required
             />
           </div>
@@ -119,24 +108,28 @@
               data-oneline=""
               type="text"
               class="inp"
-              v-model="taxId"
+              v-model.lazy="taxId"
+              @change="search()"
               required
             />
           </div>
         </div>
         <div class="input-field-wrapper">
           <div class="separator">
-            <label class="field-title"
-              >ФИО <span class="mandatory-asterisk">*</span></label
-            >
+            <label for="org_name_id" class="field-title">
+              Организация
+              <span class="mandatory-asterisk">*</span>
+            </label>
             <input
-              v-model="fullName"
+              id="org_name_id"
+              name="customf[company][value]"
               maxlength="255"
               size="50"
               data-oneline=""
               type="text"
               class="inp"
               required
+              v-model="orgName"
             />
           </div>
         </div>
@@ -272,7 +265,6 @@ export default defineComponent({
   data() {
     return {
       isLoading: false,
-      orgType: "",
       orgName: "",
       taxId: "",
       fullName: "",
@@ -287,6 +279,37 @@ export default defineComponent({
     };
   },
   methods: {
+    async search() {
+      // Установить статус загрузки
+      this.isLoading = true;
+      try {
+        // Сформировать URL для запроса к API
+        const url = `https://api.ofdata.ru/v2/company?key=6320DMGjtxv7yc4X&inn=${this.taxId}`;
+        // Отправить запрос и получить ответ с помощью axios
+        const response = await axios.get(url);
+        // Проверить наличие данных в ответе
+        if (
+          response.data.data
+        ) {
+          // Получить первый элемент из массива данных
+          const data = response.data.data;
+          console.log("Данные с API", data)
+          this.orgName = data.НаимСокр
+          this.email = data.Контакты.Емэйл
+          this.phone = data.Контакты.Тел[0]
+          
+        } else {
+          // Если данных нет, то установить сообщение об ошибке
+          alert("Компания с таким ИНН не найдена");
+        }
+      } catch (e: any) {
+        // Если произошло исключение, то установить сообщение об ошибке
+        alert("Что-то пошло не так! Попробуйте ввести ИНН еще раз или заполните данные вручную");
+      } finally {
+        // Сбросить статус загрузки
+        this.isLoading = false;
+      }
+    },
     fillTheProductsArray() {
       this.productsForCO.length = 0;
       this.shoppingCart.cart.forEach((value, key) => {
@@ -328,7 +351,6 @@ export default defineComponent({
       this.fillTheProductsArray();
       if (
         !(
-          this.orgType &&
           this.orgName &&
           this.taxId &&
           this.fullName &&
@@ -339,6 +361,7 @@ export default defineComponent({
         alert(
           "Одно из обязательных полей не было заполнено. Заполните все необходимые поля"
         );
+        return
       }
       let bearer;
       let origHeader = {
@@ -451,7 +474,6 @@ export default defineComponent({
     async saveOrderToDB(dockLink: string, manager: any) {
       if (this.supabase != undefined) {
         let note = {
-          orgType: this.orgType,
           orgName: this.orgName,
           taxId: this.taxId,
           fullName: this.fullName,

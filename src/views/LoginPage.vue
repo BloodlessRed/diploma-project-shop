@@ -45,6 +45,7 @@ export default defineComponent({
           return val.data.user;
         });
         if (currentUser != null) {
+          this.user.supabase = this.supabase
           this.user.setNewUser(currentUser)
           if(currentUser.user_metadata.role == "manager"){
             this.$router.push({

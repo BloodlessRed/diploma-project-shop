@@ -89,6 +89,7 @@ export default defineComponent({
     },
     signOut() {
       this.supabase?.auth.signOut();
+      this.userStore.$reset()
       this.$router.push({ name: "Login" });
     },
   },
@@ -160,7 +161,7 @@ export default defineComponent({
       productsToBeDisplayed = productsToBeDisplayed == undefined ? new Array() : productsToBeDisplayed
       this.orders.push({
         id: element.order_id,
-        clientCompany: clientsNote.orgType + " " + clientsNote.orgName,
+        clientCompany: clientsNote.orgName,
         products: productsToBeDisplayed,
         document: link,
         revenue: element.overall_price,
