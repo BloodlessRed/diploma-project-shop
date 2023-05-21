@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import Header from "./views/Header.vue";
-import Footer from "./views/Footer.vue";
-import { defineComponent } from "vue";
-</script>
-
 <template>
   <Header></Header>
   <router-view :key="$route.fullPath"></router-view>
@@ -11,31 +5,41 @@ import { defineComponent } from "vue";
 </template>
 
 <script lang="ts">
+import Header from "./views/Header.vue";
+import Footer from "./views/Footer.vue";
+import { defineComponent } from "vue";
 export default defineComponent({
-  data(){
-    return{
-
-    }
-  }
-})
+  components: {
+    Header,
+    Footer,
+  },
+  data() {
+    return {};
+  },
+});
 </script>
 
 <style>
 /* Global styles */
-html{
-  font-family: 'Open Sans', sans-serif;
+html {
+  font-family: "Open Sans", sans-serif;
+}
+.my-loader > div:last-of-type {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 .item {
-    width: min-content;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 20px 20px 20px;
-    padding: 10px;
-    background: #FFFFFF;
-    box-shadow: 0px 1px 8px 5px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
+  width: min-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 20px 20px 20px;
+  padding: 10px;
+  background: #ffffff;
+  box-shadow: 0px 1px 8px 5px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
 }
 /* .to-product-box{
   background: #e5e5e5;
@@ -63,7 +67,7 @@ html{
   background-color: #0a3f6c; /* Darker blue */
 }
 
-a{
+a {
   text-decoration: none;
 }
 

@@ -1,5 +1,7 @@
 <template>
   <div class="cart-main-content">
+    <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true" color="#2e75b6" class="my-loader" z-index="3"/>
+
     <table class="cart-items">
       <tr>
         <th>Фото</th>
@@ -240,10 +242,7 @@
           <span>Итого:</span>
           <span>{{ shoppingCart.formatPrice(computed_sum) }} rub</span>
         </div>
-        <input
-          type="submit"
-          value="Получить коммерческое предложение"
-        />
+        <input type="submit" value="Получить коммерческое предложение" />
       </div>
     </form>
   </div>
@@ -255,6 +254,7 @@ import axios from "axios";
 import { SignJWT as signingTool } from "jose";
 import { defineComponent, inject } from "vue";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import Loading from "vue-loading-overlay";
 
 export default defineComponent({
   setup() {
@@ -263,14 +263,15 @@ export default defineComponent({
       supabase,
     };
   },
+  components: { Loading },
   computed: {
     computed_sum(): number {
-      this.totalSum = this.shoppingCart.totalSum;
-      return this.totalSum;
+      return this.shoppingCart.totalSum;
     },
   },
   data() {
     return {
+      isLoading: false,
       orgType: "",
       orgName: "",
       taxId: "",
@@ -283,10 +284,23 @@ export default defineComponent({
       shoppingCart: useShoppingCartStore(),
       productsForCO: [] as any[],
       base64Images: new Map<number, string>(),
-      totalSum: 0,
     };
   },
   methods: {
+    fillTheProductsArray() {
+      this.productsForCO.length = 0;
+      this.shoppingCart.cart.forEach((value, key) => {
+        this.productsForCO.push({
+          prod_id: key + 1,
+          prod_for_db: value.product.id,
+          amount: value.amount,
+          vendorCode: value.product.vendorCode,
+          description: value.product.description,
+          price: value.product.price,
+          productSum: value.product.price * value.amount,
+        });
+      });
+    },
     getProductFromCart(id: number): ShoppingCartProduct {
       let prod = this.shoppingCart.cart.get(id);
       if (prod) {
@@ -305,22 +319,26 @@ export default defineComponent({
         this.getProductFromCart(prodId);
       this.shoppingCart.removeFromCart(retrievedProduct.product);
     },
-    async generateCommercialOffer(event:Event) {
-      event.preventDefault()
+    async generateCommercialOffer(event: Event) {
+      event.preventDefault();
       if (this.supabase == undefined) {
         alert("Что-то пошло не так! Перезагрузите страницу");
         return;
       }
+      this.fillTheProductsArray();
       if (
-        !(this.orgType &&
-        this.orgName &&
-        this.taxId &&
-        this.fullName &&
-        this.email &&
-        this.phone)
+        !(
+          this.orgType &&
+          this.orgName &&
+          this.taxId &&
+          this.fullName &&
+          this.email &&
+          this.phone
+        )
       ) {
-
-        alert("Одно из обязательных полей не было заполнено. Заполните все необходимые поля")
+        alert(
+          "Одно из обязательных полей не было заполнено. Заполните все необходимые поля"
+        );
       }
       let bearer;
       let origHeader = {
@@ -375,9 +393,10 @@ export default defineComponent({
         fullName: this.fullName,
         manager: manager.full_name,
         job_title: manager.job_title,
-        phone_num:manager.phone_num,
+        phone_num: manager.phone_num,
         products: this.productsForCO,
       };
+      this.isLoading = true;
       await axios
         .post(
           "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
@@ -427,6 +446,7 @@ export default defineComponent({
           };
           fr.readAsDataURL(docLink);
         });
+      this.isLoading = false;
     },
     async saveOrderToDB(dockLink: string, manager: any) {
       if (this.supabase != undefined) {
@@ -445,7 +465,7 @@ export default defineComponent({
           .from("Orders")
           .insert([
             {
-              overall_price: this.totalSum,
+              overall_price: this.shoppingCart.totalSum,
               document: dockLink,
               note: JSON.stringify(note),
               manager_id: manager.manager_id,
@@ -474,44 +494,23 @@ export default defineComponent({
     },
   },
   async mounted() {
-    this.totalSum = this.shoppingCart.totalSum;
-    let products: unknown[] = [];
-    let image = this.$refs.prodPic;
-    let imgBase64;
-    this.shoppingCart.cart.forEach((value, key) => {
-      products.push({
-        prod_id: key + 1,
-        prod_for_db: value.product.id,
-        amount: value.amount,
-        vendorCode: value.product.vendorCode,
-        description: value.product.description,
-        price: value.product.price,
-        productSum: value.product.price * value.amount,
-        photo: "stub",
-      });
-      fetch(`../img/${value.product.img}-Nutrunners.svg`)
-        .then((res) => {
-          return res.blob();
-        })
-        .then((blob) => {
-          // Read the Blob as DataURL using the FileReader API
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            if (reader.result) {
-              const base64 = reader.result;
-              this.base64Images.set(key, base64.toString());
-            }
-          };
-          reader.readAsDataURL(blob);
-        });
-    });
+    this.fillTheProductsArray();
     console.log("KEY ", this.shoppingCart.cart.keys);
-    console.log("CURRENT PRODUCTS ", products);
-    this.productsForCO = products;
+    console.log("CURRENT PRODUCTS ", this.productsForCO);
   },
 });
 </script>
 <style scoped>
+.my-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(10px);
+}
+
 .product-counter {
   display: flex;
   justify-content: center;

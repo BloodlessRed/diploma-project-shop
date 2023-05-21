@@ -10,7 +10,7 @@
     </div>
     <div class="search-box">
       <div class="filter">
-        <h3>Категории</h3>
+        <h3>Категории товаров</h3>
         <ul class="category-list">
           <li v-for="(category, index) in filters" :key="index">
             <input

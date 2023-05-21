@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import { useCurrentUserStore } from "@/stores/currentUser";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { defineComponent, inject } from "vue";
 
@@ -65,6 +66,7 @@ export default defineComponent({
   },
   data() {
     return {
+      userStore: useCurrentUserStore(),
       name: "John Smith",
       email: "john.smith@newtonm.com",
       phone: "+1234567890",
@@ -94,9 +96,9 @@ export default defineComponent({
     if (this.supabase == undefined) {
       return;
     }
-    let email = this.$route.params.manager;
+    let email = this.userStore.supabaseUser.email;
     console.log("email ", email);
-    let data = await this.supabase
+    let data:any = await this.supabase
       .from("Orders")
       .select("*, Managers!inner(full_name, login, phone_num)")
       .eq("Managers.login", email)
@@ -107,42 +109,59 @@ export default defineComponent({
     if (data == null) {
       return;
     }
+
+    this.name = data[0].Managers.full_name;
+    this.email = data[0].Managers.login;
+    this.phone = data[0].Managers.phone_num;
     this.orders = [];
+
+    let temp_order_ids = []
+    for(let i = 0; i < data.length; i++){
+      let element = data[i];
+      temp_order_ids.push(element.order_id)
+    }
+    let products = await this.supabase
+        .from("products_in_order")
+        .select("order_id,vendor_code, amount")
+        .in("order_id", temp_order_ids)
+        .order("order_id")
+        .then((value) => {
+          if(value.data != null){
+            let productMap = new Map<string,Array<{vendor_code:any, amount:any}>>()
+            value.data.forEach((item)=>{
+              let tempProduct = {vendor_code:item.vendor_code, amount:item.amount}
+              if(productMap.has(String(item.order_id))){
+                productMap.get(String(item.order_id))?.push(tempProduct)
+              }else{
+                productMap.set(String(item.order_id), new Array<{vendor_code:any, amount:any}>(tempProduct))
+              }
+            });
+            return productMap
+          }
+        });
+      console.log(products)
     for (let i = 0; i < data.length; i++) {
       let element = data[i];
       if (element.Managers == null) {
-        break;
+        continue;
       }
-      this.name = element.Managers.full_name;
-      this.email = element.Managers.login;
-      this.phone = element.Managers.phone_num;
+
       let clientsNote = JSON.parse(element.note);
-      let products = await this.supabase
-        .from("products_in_order")
-        .select("vendor_code, amount")
-        .eq("order_id", element.order_id)
-        .then((value) => {
-          return value.data;
-        });
-      if (products == null) {
-        products = [];
-      }
+      
       let base64str: string = element.document;
-      console.log(base64str.split(",")[1]);
       let binary = window.atob(base64str.split(",")[1]); // remove the data URL prefix and convert to binary
       let array = [];
       for (let i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i)); // convert each character to its ASCII code
       }
       let blob = new Blob([new Uint8Array(array)], { type: "application/pdf" });
-      // let docBlob = new Blob([base64str.split(",")[1]], {
-      // type: "application/pdf",
-      // });
       let link = URL.createObjectURL(blob);
+      let productsToBeDisplayed = products?.get(String(element.order_id))
+      productsToBeDisplayed = productsToBeDisplayed == undefined ? new Array() : productsToBeDisplayed
       this.orders.push({
         id: element.order_id,
         clientCompany: clientsNote.orgType + " " + clientsNote.orgName,
-        products: products,
+        products: productsToBeDisplayed,
         document: link,
         revenue: element.overall_price,
       });

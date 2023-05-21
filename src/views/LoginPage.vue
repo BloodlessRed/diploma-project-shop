@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts">
+import { useCurrentUserStore } from "@/stores/currentUser";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { defineComponent, inject } from "vue";
 export default defineComponent({
@@ -31,6 +32,7 @@ export default defineComponent({
     return {
       email: "",
       password: "",
+      user:useCurrentUserStore()
     };
   },
   methods: {
@@ -42,14 +44,14 @@ export default defineComponent({
         let currentUser = await this.supabase.auth.getUser().then((val) => {
           return val.data.user;
         });
-        if (
-          currentUser != null &&
-          currentUser.user_metadata.role == "manager"
-        ) {
-          this.$router.push({
+        if (currentUser != null) {
+          this.user.setNewUser(currentUser)
+          if(currentUser.user_metadata.role == "manager"){
+            this.$router.push({
             name: "ManagersPage",
             params: { manager: currentUser.email },
           });
+          }
         }
       }
     },

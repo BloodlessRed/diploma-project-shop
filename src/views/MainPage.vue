@@ -11,6 +11,7 @@
             name: 'Manufacturer',
             params: { manufacturer: manufacturer },
           }"
+          active-class="active-link"
         >
           <span>
             {{ manufacturer }}
@@ -58,7 +59,6 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-
 img {
   max-width: fit-content;
 }
@@ -107,8 +107,20 @@ img {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-right: 5px;
+  margin-right: 15px;
 }
+/* a {
+  border: solid 0.1rem #c0c0c0;
+  border-radius: 0.5rem;
+  transition: border 0.3s, box-shadow 0.3s; 
+} */
+
+.active-link {
+  border: solid 0.2rem #c0c0c0; /* change this line */
+  box-shadow: 0 0 15px #c0c0c0; /* change this line */
+}
+
+
 .manufacturer-logo {
   width: auto;
   height: 90%;
