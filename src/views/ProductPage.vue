@@ -204,6 +204,7 @@ export default defineComponent({
   line-height: 1.3;
 }
 .item > img {
+  height: 200px;
   width: 200px;
 }
 .img-container {

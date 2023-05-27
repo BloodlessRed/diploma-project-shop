@@ -1,9 +1,10 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 import App from './App.vue'
 import router from './router'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import {LoadingPlugin} from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/css/index.css';
 
 import './assets/main.css'
 import { createClient } from '@supabase/supabase-js'
@@ -17,6 +18,7 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl,supabaseKey)
 app.provide('supabase',supabase)
 app.use(pinia)
+app.use(LoadingPlugin)
 app.use(router)
 
 app.mount('#app')

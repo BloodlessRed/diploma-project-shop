@@ -1,14 +1,5 @@
 <template>
   <div class="cart-main-content">
-    <loading
-      :active.sync="isLoading"
-      :can-cancel="false"
-      :is-full-page="true"
-      color="#2e75b6"
-      class="my-loader"
-      z-index="3"
-    />
-
     <table class="cart-items">
       <tr>
         <th>Фото</th>
@@ -247,7 +238,6 @@ import axios from "axios";
 import { SignJWT as signingTool } from "jose";
 import { defineComponent, inject } from "vue";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import Loading from "vue-loading-overlay";
 
 export default defineComponent({
   setup() {
@@ -256,7 +246,6 @@ export default defineComponent({
       supabase,
     };
   },
-  components: { Loading },
   computed: {
     computed_sum(): number {
       return this.shoppingCart.totalSum;
@@ -264,7 +253,6 @@ export default defineComponent({
   },
   data() {
     return {
-      isLoading: false,
       orgName: "",
       taxId: "",
       fullName: "",
@@ -281,7 +269,7 @@ export default defineComponent({
   methods: {
     async search() {
       // Установить статус загрузки
-      this.isLoading = true;
+      
       try {
         // Сформировать URL для запроса к API
         const url = `https://api.ofdata.ru/v2/company?key=6320DMGjtxv7yc4X&inn=${this.taxId}`;
@@ -307,7 +295,6 @@ export default defineComponent({
         alert("Что-то пошло не так! Попробуйте ввести ИНН еще раз или заполните данные вручную");
       } finally {
         // Сбросить статус загрузки
-        this.isLoading = false;
       }
     },
     fillTheProductsArray() {
@@ -419,7 +406,12 @@ export default defineComponent({
         phone_num: manager.phone_num,
         products: this.productsForCO,
       };
-      this.isLoading = true;
+      let loader = this.$loading.show({
+        active:true,
+        isFullPage:true,
+        zIndex:3,
+        color:"#2e75b6"
+      })
       await axios
         .post(
           "https://us1.pdfgeneratorapi.com/api/v4/documents/generate",
@@ -469,7 +461,7 @@ export default defineComponent({
           };
           fr.readAsDataURL(docLink);
         });
-      this.isLoading = false;
+      loader.hide()
     },
     async saveOrderToDB(dockLink: string, manager: any) {
       if (this.supabase != undefined) {
@@ -523,15 +515,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.my-loader {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 100vh;
-  transform: translate(-50%, -50%);
-  backdrop-filter: blur(10px);
-}
+
 
 .product-counter {
   display: flex;

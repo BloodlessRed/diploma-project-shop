@@ -37,10 +37,8 @@
                 <td>{{ order.revenue }}</td>
                 <td><a :href="order.document">Commercial offer</a></td>
                 <td>
-                  <button
-                    v-if="true"
-                    @click="createAccount(order.clientCompany)"
-                  >
+                  <!-- Removed the v-if condition as it was always true -->
+                  <button @click="createAccount(order.clientCompany)">
                     Create Account
                   </button>
                 </td>
@@ -48,15 +46,104 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Moved the buttons for editing and adding products to the same place -->
+        <div class="editor-buttons">
+          <!-- Added a label for clarity -->
+          <label for="editor-buttons">Product Actions:</label>
+
+          <!-- Added a button for adding a new product -->
+          <button @click="addProduct">Add Product</button>
+
+          <!-- Changed the button text to "Search and Edit Product" -->
+          <button @click="toggleEditor">Search and Edit Product</button>
+        </div>
+
+        <div class="editor-wrapper">
+          <div class="product-editor" v-if="showEditor">
+            <h2>Product Editor</h2>
+            <!-- New input for vendor code -->
+            <div class="vendor-code-input">
+              <label for="vendor-code">Vendor Code:</label>
+              <input
+                id="vendor-code"
+                type="text"
+                v-model.lazy="vendorCode"
+                @change="searchProduct"
+              />
+            </div>
+            <!-- Conditional table for displaying and editing the found products -->
+            <table v-if="foundProducts.length > 0">
+              <thead>
+                <tr>
+                  <th>Vendor Code</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Manufacturer</th>
+                  <th>Category</th>
+                  <!-- Added a column for the update button -->
+                  <th>Update</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Changed the v-for loop to iterate over the foundProducts array -->
+                <tr v-for="product in foundProducts" :key="product.id">
+                  <!-- Using v-model to bind the data -->
+                  <td>
+                    <input type="text" v-model="product.vendor_code" disabled />
+                  </td>
+                  <td>
+                    <input type="text" v-model.lazy="product.description" />
+                  </td>
+                  <td>
+                    <input type="number" v-model.lazy="product.price" @change="test(product)" />
+                  </td>
+                  <!-- Added inputs for manufacturer and category -->
+                  <td>
+                    <input
+                      type="text"
+                      v-model="product.manufacturer"
+                      disabled
+                    />
+                  </td>
+                  <td>
+                    <!-- Using a select element for the category -->
+                    <input
+                      type="text"
+                      v-model="product.category_obj.code"
+                      disabled
+                    />
+                  </td>
+                  <!-- Added a button for updating the selected product in each row -->
+                  <td>
+                    <button @click="updateProduct(product)">
+                      Update Product
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { useCurrentUserStore } from "@/stores/currentUser";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { type } from "os";
 import { defineComponent, inject } from "vue";
+type FullProduct = {
+        id: any;
+        description: string;
+        price: number;
+        manufacturer?: string;
+        img?: string;
+        category?: number;
+        vendor_code: string;
+        category_obj?:any
+      }
 
 export default defineComponent({
   name: "ManagersPage",
@@ -80,16 +167,148 @@ export default defineComponent({
           revenue: 1000,
         },
       ],
+      products: [] as any[],
+      // New data property for controlling the visibility of the product editor
+      showEditor: false,
+      // New data property for storing the input value of the vendor code
+      vendorCode: "",
+      // Modified data property for storing the found products
+      foundProducts: [] as FullProduct[],
+      // New data property for storing the categories
+      categories: [] as {
+        code: string;
+        full_description: string;
+      }[],
     };
   },
   methods: {
+    test(product:any){
+      console.log(product)
+    },
+    // New method for fetching the categories
+    async fetchCategories() {
+      if (this.supabase == undefined) {
+        return;
+      }
+      let data: any = await this.supabase
+        .from("Categories")
+        .select("code, full_description")
+        .then((val) => {
+          return val.data;
+        });
+      if (data == null) {
+        return;
+      }
+      this.categories = data;
+    },
+    // New method for changing the category of a product
+    async changeCategory(product: any, category: any) {
+      if (this.supabase == undefined) {
+        return;
+      }
+      // write your logic to update the category of a product in the database using supabase
+      // you can use product.vendor_code as the primary key
+      // you can use category.code as the new value
+      alert(
+        `Changing category of product ${product.vendor_code} to ${category.code}`
+      );
+    },
+    // Modified method for toggling the product editor
+    toggleEditor() {
+      this.showEditor = !this.showEditor;
+      // Added a call to fetch the categories when the editor is shown
+      if (this.showEditor) {
+        this.fetchCategories();
+      }
+    },
+    // Modified method for searching a product by vendor code
+    async searchProduct() {
+      if (this.supabase == undefined) {
+        return;
+      }
+      // Modified the query to include an inner join with the Category table and select all the columns from the Products table
+      let foundProducts = await this.supabase
+        .from("Products")
+        .select(
+          "id,description,price,manufacturer,img,category,vendor_code,Categories!inner(code, full_description)"
+        )
+        .ilike("vendor_code", "%" + this.vendorCode + "%")
+        .limit(1, { foreignTable: "Categories" })
+        .then((result) => {
+          console.log("FOUND PRODUCTS ", result);
+          if (result.data == null) {
+            return [];
+          }
+          return result.data;
+        });
+      // Assigning the whole array of the found products to the foundProducts data property
+      this.foundProducts = foundProducts.map((element) => {
+        let categories = element.Categories
+        return {
+          id: element.id,
+          description: element.description,
+          price: element.price,
+          manufacturer: element.manufacturer,
+          img: element.img,
+          category: element.category,
+          vendor_code: element.vendor_code,
+          category_obj:categories
+        };
+      });
+      alert(`Searching product by ${this.vendorCode}`);
+    },
+    // New method for updating the selected product
+    async updateProduct(product: any) {
+      if (this.supabase == undefined) {
+        return;
+      }
+      this.supabase.from("Products").update({description:product})
+      // write your logic to update the selected product in the database using supabase
+      // you can use product as the updated value
+      // you can use product.vendor_code as the primary key
+      alert(`Updating product ${product.vendor_code}`);
+    },
+    async fetchProducts() {
+      if (this.supabase == undefined) {
+        return;
+      }
+      let data: any = await this.supabase
+        .from("Products")
+        .select("*")
+        .then((val) => {
+          return val.data;
+        });
+      if (data == null) {
+        return;
+      }
+      this.products = data;
+    },
+    // New method for editing a product
+    async editProduct(product: any) {
+      if (this.supabase == undefined) {
+        return;
+      }
+      // write your logic to edit a product in the database
+      // you can use product.vendor_code as the primary key
+      // you can use prompt() or modal to get the new values from the user
+      alert(`Editing product ${product.vendor_code}`);
+    },
+    // New method for adding a product
+    async addProduct() {
+      if (this.supabase == undefined) {
+        return;
+      }
+      // write your logic to add a new product in the database
+      // you can use prompt() or modal to get the values from the user
+      alert(`Adding a new product`);
+    },
     createAccount(clientName: string) {
       // write your logic to create a new account for the client
       alert(`Creating account for ${clientName}`);
     },
     signOut() {
       this.supabase?.auth.signOut();
-      this.userStore.$reset()
+      this.userStore.$reset();
       this.$router.push({ name: "Login" });
     },
   },
@@ -99,7 +318,7 @@ export default defineComponent({
     }
     let email = this.userStore.supabaseUser.email;
     console.log("email ", email);
-    let data:any = await this.supabase
+    let data: any = await this.supabase
       .from("Orders")
       .select("*, Managers!inner(full_name, login, phone_num)")
       .eq("Managers.login", email)
@@ -116,31 +335,40 @@ export default defineComponent({
     this.phone = data[0].Managers.phone_num;
     this.orders = [];
 
-    let temp_order_ids = []
-    for(let i = 0; i < data.length; i++){
+    let temp_order_ids = [];
+    for (let i = 0; i < data.length; i++) {
       let element = data[i];
-      temp_order_ids.push(element.order_id)
+      temp_order_ids.push(element.order_id);
     }
     let products = await this.supabase
-        .from("products_in_order")
-        .select("order_id,vendor_code, amount")
-        .in("order_id", temp_order_ids)
-        .order("order_id")
-        .then((value) => {
-          if(value.data != null){
-            let productMap = new Map<string,Array<{vendor_code:any, amount:any}>>()
-            value.data.forEach((item)=>{
-              let tempProduct = {vendor_code:item.vendor_code, amount:item.amount}
-              if(productMap.has(String(item.order_id))){
-                productMap.get(String(item.order_id))?.push(tempProduct)
-              }else{
-                productMap.set(String(item.order_id), new Array<{vendor_code:any, amount:any}>(tempProduct))
-              }
-            });
-            return productMap
-          }
-        });
-      console.log(products)
+      .from("products_in_order")
+      .select("order_id,vendor_code, amount")
+      .in("order_id", temp_order_ids)
+      .order("order_id")
+      .then((value) => {
+        if (value.data != null) {
+          let productMap = new Map<
+            string,
+            Array<{ vendor_code: any; amount: any }>
+          >();
+          value.data.forEach((item) => {
+            let tempProduct = {
+              vendor_code: item.vendor_code,
+              amount: item.amount,
+            };
+            if (productMap.has(String(item.order_id))) {
+              productMap.get(String(item.order_id))?.push(tempProduct);
+            } else {
+              productMap.set(
+                String(item.order_id),
+                new Array<{ vendor_code: any; amount: any }>(tempProduct)
+              );
+            }
+          });
+          return productMap;
+        }
+      });
+    console.log(products);
     for (let i = 0; i < data.length; i++) {
       let element = data[i];
       if (element.Managers == null) {
@@ -148,7 +376,7 @@ export default defineComponent({
       }
 
       let clientsNote = JSON.parse(element.note);
-      
+
       let base64str: string = element.document;
       let binary = window.atob(base64str.split(",")[1]); // remove the data URL prefix and convert to binary
       let array = [];
@@ -157,8 +385,11 @@ export default defineComponent({
       }
       let blob = new Blob([new Uint8Array(array)], { type: "application/pdf" });
       let link = URL.createObjectURL(blob);
-      let productsToBeDisplayed = products?.get(String(element.order_id))
-      productsToBeDisplayed = productsToBeDisplayed == undefined ? new Array() : productsToBeDisplayed
+      let productsToBeDisplayed = products?.get(String(element.order_id));
+      productsToBeDisplayed =
+        productsToBeDisplayed == undefined
+          ? new Array()
+          : productsToBeDisplayed;
       this.orders.push({
         id: element.order_id,
         clientCompany: clientsNote.orgName,
@@ -191,7 +422,6 @@ export default defineComponent({
 
 /* Container */
 .container {
-  width: 80%;
   margin: 0 auto;
   border: 1px solid #2e75b6;
   background-color: #ffffff;
@@ -222,15 +452,18 @@ export default defineComponent({
 /* Content */
 .content {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-areas: /* changed grid template */
+    "personal-info current-orders"
+    "editor-buttons editor-buttons" /* added a new row for the editor buttons */
+    "editor-wrapper editor-wrapper";
   gap: 20px;
   padding: 20px;
 }
-
 /* Personal info */
 .personal-info {
   border: 1px solid black;
   padding: 10px;
+  grid-area: personal-info; /* added grid-area */
 }
 
 .personal-info h2 {
@@ -244,17 +477,15 @@ export default defineComponent({
 
   margin-bottom: 5px;
 }
-
 /* Current orders */
 .current-orders {
   border: 1px solid black;
   padding: 10px;
   overflow-x: auto; /* for responsiveness */
+  grid-area: current-orders; /* added grid-area */
 }
 
 .current-orders h2 {
-  color: #0a3f6c;
-
   margin-bottom: 10px;
 }
 
@@ -292,5 +523,94 @@ export default defineComponent({
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+}
+/* Editor buttons */
+.editor-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* for spacing */
+  grid-area: editor-buttons; /* added grid-area */
+}
+
+.editor-buttons label {
+  color: #0a3f6c; /* for consistency */
+}
+
+/* Editor wrapper */
+.editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  grid-area: editor-wrapper; /* added grid-area */
+}
+
+/* Product editor */
+.product-editor {
+  border: 1px solid black;
+  padding: 10px;
+  margin-top: 10px; /* added margin */
+}
+
+.product-editor h2 {
+  color: #0a3f6c;
+
+  margin-bottom: 10px;
+}
+
+.product-editor table {
+  width: 100%;
+  border-collapse: collapse; /* for minimalistic design */
+}
+
+.product-editor th,
+.product-editor td {
+  border-bottom: 1px solid black; /* for minimalistic design */
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.product-editor th {
+  font-weight: bold;
+}
+
+.product-editor td {
+  color: #2e75b6;
+  font-weight: normal;
+}
+
+.product-editor button {
+  color: #ffffff;
+  background-color: #0a3f6c;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Vendor code input */
+.vendor-code-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vendor-code-input label {
+  color: #0a3f6c;
+  font-weight: bold;
+}
+
+.vendor-code-input input {
+  width: 200px;
+}
+
+/* Modified button for toggling the product editor */
+button {
+  color: #ffffff;
+  background-color: #0a3f6c;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  width: 200px; /* added width */
+  margin-bottom: 10px; /* added margin */
 }
 </style>

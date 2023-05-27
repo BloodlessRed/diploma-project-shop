@@ -1,5 +1,5 @@
 <template>
-  <div v-if="products.length > 0" class="product-specific-wrapper">
+  <div class="product-specific-wrapper" ref="loaderAnchor">
     <div class="products">
       <ProductCard
         v-for="(product, index) in cmptd_category"
@@ -70,16 +70,19 @@ export default defineComponent({
       selectedCategories: [] as string[],
     };
   },
-  methods: {
-    stagger(index: number) {
-      return index * 100000000000000;
-    },
-  },
-  mounted() {
+  async mounted() {
     if (this.supabase == undefined) {
       return;
     }
-    this.supabase
+    let loader = this.$loading.show({
+      active: true,
+      zIndex: 3,
+      isFullPage: false,
+      container: this.$refs.loaderAnchor as HTMLElement,
+      color: "#2e75b6",
+    });
+    await setTimeout(() => console.log(), 10000);
+    await this.supabase
       .from("Products")
       .select(
         `*,
@@ -106,7 +109,7 @@ export default defineComponent({
           });
         }
       });
-    this.supabase
+    await this.supabase
       .from("distinct_categories_for_manufacturers")
       .select("code, full_description")
       .eq("manufacturer", this.manufacturer)
@@ -115,12 +118,14 @@ export default defineComponent({
           this.filters = value.data;
         }
       });
+    loader.hide();
   },
 });
 </script>
 <style scoped>
 .product-specific-wrapper {
   display: flex;
+  position: relative;
   /* justify-content: stretch; */
   width: 80%;
 }

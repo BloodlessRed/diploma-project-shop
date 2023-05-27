@@ -26,10 +26,8 @@ export default defineComponent({
 html {
   font-family: "Open Sans", sans-serif;
 }
-.my-loader > div:last-of-type {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+body .vl-overlay {
+  backdrop-filter: blur(10px);
 }
 .item {
   width: min-content;
@@ -43,11 +41,6 @@ html {
   box-shadow: 0px 1px 8px 5px rgba(0, 0, 0, 0.25);
   border-radius: 4px;
 }
-/* .to-product-box{
-  background: #e5e5e5;
-    border-radius: 4px;
-    padding: 5px 10px;
-} */
 
 .custom-button {
   background-color: #2e75b6; /* Corporate blue */
