@@ -47,7 +47,7 @@ export default defineComponent({
       return;
     }
     await this.supabase
-      .from("distinct_manufacturers")
+      .from("Manufacturers")
       .select("manufacturer")
       .then((value) => {
         value.data != null

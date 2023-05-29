@@ -87,8 +87,8 @@ export default defineComponent({
     }
     console.log("current vendor code", this.product_id.toLocaleUpperCase())
     await this.supabase
-      .from("Products")
-      .select(`*, Categories(code)`)
+      .from("full_products")
+      .select(`*`)
       .ilike("vendor_code", "%"+this.product_id+"%")
       .then((value) => {
         console.log(value)
@@ -100,7 +100,7 @@ export default defineComponent({
             item.id,
             item.description,
             item.manufacturer,
-            item.Categories.code,
+            item.category,
             item.vendor_code,
             item.price,
             item.img
@@ -130,20 +130,20 @@ export default defineComponent({
         });
       });
     this.supabase
-      .from("Products")
-      .select(`*, Categories!inner(code)`)
-      .eq("Categories.code", this.product.category)
+      .from("full_products")
+      .select(`*`)
+      .eq("Categories.full_description", this.product.category)
       .then((value) => {
         console.log("Affiliated products are ", value);
         value.data?.map((item) => {
-          if (item.Categories.code != null && item.id != this.product.id) {
+          if (item.category != null && item.id != this.product.id) {
             console.log("ID - ",this.product.id)
             this.similarProducts.push(
               new Product(
                 item.id,
                 item.description,
                 item.manufacturer,
-                item.Categories.code,
+                item.category,
                 item.vendor_code,
                 item.price,
                 item.img

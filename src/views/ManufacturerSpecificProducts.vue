@@ -15,12 +15,12 @@
           <li v-for="(category, index) in filters" :key="index">
             <input
               type="checkbox"
-              :id="category.code + index"
-              :value="category.code"
+              :id="category + index"
+              :value="category"
               v-model="selectedCategories"
             />
-            <label :for="category.code + index"
-              >{{ category.code }} ({{ category.full_description }})</label
+            <label :for="category + index"
+              >{{ category }}</label
             >
           </li>
         </ul>
@@ -81,14 +81,10 @@ export default defineComponent({
       container: this.$refs.loaderAnchor as HTMLElement,
       color: "#2e75b6",
     });
-    await setTimeout(() => console.log(), 10000);
     await this.supabase
-      .from("Products")
+      .from("full_products")
       .select(
-        `*,
-        Categories (
-          code
-        )`
+        `*`
       )
       .eq("manufacturer", this.manufacturer)
       .then((value) => {
@@ -100,7 +96,7 @@ export default defineComponent({
                 item.id,
                 item.description,
                 item.manufacturer,
-                item.Categories.code,
+                item.category,
                 item.vendor_code,
                 item.price,
                 item.img
@@ -111,11 +107,13 @@ export default defineComponent({
       });
     await this.supabase
       .from("distinct_categories_for_manufacturers")
-      .select("code, full_description")
+      .select("category")
       .eq("manufacturer", this.manufacturer)
       .then((value) => {
         if (value.data != null) {
-          this.filters = value.data;
+          this.filters = value.data.map((elem)=>{
+            return elem.category
+          });
         }
       });
     loader.hide();

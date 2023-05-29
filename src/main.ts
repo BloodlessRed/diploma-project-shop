@@ -8,6 +8,7 @@ import 'vue-loading-overlay/dist/css/index.css';
 
 import './assets/main.css'
 import { createClient } from '@supabase/supabase-js'
+window.localStorage.clear
 window.sessionStorage.clear
 const pinia = createPinia()
 

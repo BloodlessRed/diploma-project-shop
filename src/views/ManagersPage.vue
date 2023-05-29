@@ -3,26 +3,26 @@
     <div class="container">
       <div class="header">
         <h1>{{ company }}</h1>
-        <button class="sign-out" @click="signOut()">Sign out</button>
+        <button class="sign-out" @click="signOut()">Выйти</button>
       </div>
       <div class="content">
         <div class="personal-info">
-          <h2>Personal Information</h2>
-          <p><strong>Name:</strong> {{ name }}</p>
+          <h2>Личная информация</h2>
+          <p><strong>Имя:</strong> {{ name }}</p>
           <p><strong>Email:</strong> {{ email }}</p>
-          <p><strong>Phone:</strong> {{ phone }}</p>
+          <p><strong>Телефон:</strong> {{ phone }}</p>
         </div>
         <div class="current-orders">
-          <h2>Current Orders</h2>
+          <h2>Текущие заказы</h2>
           <table>
             <thead>
               <tr>
-                <th>Order ID</th>
-                <th>Client Name</th>
-                <th>Product</th>
-                <th>Revenue</th>
-                <th>Document</th>
-                <th>Action</th>
+                <th>Номер заказа</th>
+                <th>Название организации</th>
+                <th>Продукт</th>
+                <th>Выручка</th>
+                <th>Документ</th>
+                <th>Действие</th>
               </tr>
             </thead>
             <tbody>
@@ -35,11 +35,11 @@
                   /></span>
                 </td>
                 <td>{{ order.revenue }}</td>
-                <td><a :href="order.document">Commercial offer</a></td>
+                <td><a :href="order.document">Коммерческое предложение</a></td>
                 <td>
                   <!-- Removed the v-if condition as it was always true -->
                   <button @click="createAccount(order.clientCompany)">
-                    Create Account
+                    Создать аккаунт
                   </button>
                 </td>
               </tr>
@@ -50,21 +50,21 @@
         <!-- Moved the buttons for editing and adding products to the same place -->
         <div class="editor-buttons">
           <!-- Added a label for clarity -->
-          <label for="editor-buttons">Product Actions:</label>
+          <label for="editor-buttons">Действия с продуктом:</label>
 
           <!-- Added a button for adding a new product -->
-          <button @click="addProduct">Add Product</button>
+          <button @click="toggleCreator">Добавить продукт</button>
 
           <!-- Changed the button text to "Search and Edit Product" -->
-          <button @click="toggleEditor">Search and Edit Product</button>
+          <button @click="toggleEditor">Найти и отредактировать продукт</button>
         </div>
-
+        <product-creator v-if="showCreator"></product-creator>
         <div class="editor-wrapper">
           <div class="product-editor" v-if="showEditor">
-            <h2>Product Editor</h2>
+            <h2>Редактор продуктов</h2>
             <!-- New input for vendor code -->
             <div class="vendor-code-input">
-              <label for="vendor-code">Vendor Code:</label>
+              <label for="vendor-code">Артикул:</label>
               <input
                 id="vendor-code"
                 type="text"
@@ -76,13 +76,13 @@
             <table v-if="foundProducts.length > 0">
               <thead>
                 <tr>
-                  <th>Vendor Code</th>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Manufacturer</th>
-                  <th>Category</th>
+                  <th>Артикул</th>
+                  <th>Название</th>
+                  <th>Цена</th>
+                  <th>Производитель</th>
+                  <th>Категория</th>
                   <!-- Added a column for the update button -->
-                  <th>Update</th>
+                  <th>Действия</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,7 +96,7 @@
                     <input type="text" v-model.lazy="product.description" />
                   </td>
                   <td>
-                    <input type="number" v-model.lazy="product.price" @change="test(product)" />
+                    <input type="number" v-model.lazy="product.price" />
                   </td>
                   <!-- Added inputs for manufacturer and category -->
                   <td>
@@ -110,14 +110,17 @@
                     <!-- Using a select element for the category -->
                     <input
                       type="text"
-                      v-model="product.category_obj.code"
+                      v-model="product.category"
                       disabled
                     />
                   </td>
                   <!-- Added a button for updating the selected product in each row -->
-                  <td>
+                  <td class="editor-actions">
                     <button @click="updateProduct(product)">
-                      Update Product
+                      Обновить продукт
+                    </button>
+                    <button @click="deleteProduct(product)">
+                      Удалить продукт
                     </button>
                   </td>
                 </tr>
@@ -132,24 +135,26 @@
 <script lang="ts">
 import { useCurrentUserStore } from "@/stores/currentUser";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { type } from "os";
+import ProductCreator from "./ProductCreator.vue";
 import { defineComponent, inject } from "vue";
 type FullProduct = {
-        id: any;
-        description: string;
-        price: number;
-        manufacturer?: string;
-        img?: string;
-        category?: number;
-        vendor_code: string;
-        category_obj?:any
-      }
+  id: any;
+  description: string;
+  price: number;
+  manufacturer?: string;
+  img?: string;
+  category?: string;
+  vendor_code: string;
+};
 
 export default defineComponent({
   name: "ManagersPage",
   setup() {
     const supabase: SupabaseClient | undefined = inject("supabase");
     return { supabase };
+  },
+  components: {
+    ProductCreator,
   },
   data() {
     return {
@@ -170,56 +175,25 @@ export default defineComponent({
       products: [] as any[],
       // New data property for controlling the visibility of the product editor
       showEditor: false,
+      showCreator: false,
       // New data property for storing the input value of the vendor code
       vendorCode: "",
       // Modified data property for storing the found products
       foundProducts: [] as FullProduct[],
       // New data property for storing the categories
       categories: [] as {
-        code: string;
         full_description: string;
       }[],
     };
   },
   methods: {
-    test(product:any){
-      console.log(product)
-    },
-    // New method for fetching the categories
-    async fetchCategories() {
-      if (this.supabase == undefined) {
-        return;
-      }
-      let data: any = await this.supabase
-        .from("Categories")
-        .select("code, full_description")
-        .then((val) => {
-          return val.data;
-        });
-      if (data == null) {
-        return;
-      }
-      this.categories = data;
-    },
-    // New method for changing the category of a product
-    async changeCategory(product: any, category: any) {
-      if (this.supabase == undefined) {
-        return;
-      }
-      // write your logic to update the category of a product in the database using supabase
-      // you can use product.vendor_code as the primary key
-      // you can use category.code as the new value
-      alert(
-        `Changing category of product ${product.vendor_code} to ${category.code}`
-      );
+    // New method for toggling the product adder
+    toggleCreator() {
+      this.showCreator = !this.showCreator;
     },
     // Modified method for toggling the product editor
     toggleEditor() {
       this.showEditor = !this.showEditor;
-      // Added a call to fetch the categories when the editor is shown
-      if (this.showEditor) {
-        this.fetchCategories();
-      }
     },
     // Modified method for searching a product by vendor code
     async searchProduct() {
@@ -228,12 +202,11 @@ export default defineComponent({
       }
       // Modified the query to include an inner join with the Category table and select all the columns from the Products table
       let foundProducts = await this.supabase
-        .from("Products")
+        .from("full_products")
         .select(
-          "id,description,price,manufacturer,img,category,vendor_code,Categories!inner(code, full_description)"
+          "id,description,price,manufacturer,img,category,vendor_code"
         )
         .ilike("vendor_code", "%" + this.vendorCode + "%")
-        .limit(1, { foreignTable: "Categories" })
         .then((result) => {
           console.log("FOUND PRODUCTS ", result);
           if (result.data == null) {
@@ -243,7 +216,7 @@ export default defineComponent({
         });
       // Assigning the whole array of the found products to the foundProducts data property
       this.foundProducts = foundProducts.map((element) => {
-        let categories = element.Categories
+        let category = element.category;
         return {
           id: element.id,
           description: element.description,
@@ -251,47 +224,25 @@ export default defineComponent({
           manufacturer: element.manufacturer,
           img: element.img,
           category: element.category,
-          vendor_code: element.vendor_code,
-          category_obj:categories
+          vendor_code: element.vendor_code
         };
       });
       alert(`Searching product by ${this.vendorCode}`);
     },
     // New method for updating the selected product
-    async updateProduct(product: any) {
+    async updateProduct(product: FullProduct) {
       if (this.supabase == undefined) {
         return;
       }
-      this.supabase.from("Products").update({description:product})
+      this.supabase
+        .from("Products")
+        .update({ description: product.description, price: product.price })
+        .eq("vendor_code", product.vendor_code)
+        .then((res) => console.log(res));
       // write your logic to update the selected product in the database using supabase
       // you can use product as the updated value
       // you can use product.vendor_code as the primary key
       alert(`Updating product ${product.vendor_code}`);
-    },
-    async fetchProducts() {
-      if (this.supabase == undefined) {
-        return;
-      }
-      let data: any = await this.supabase
-        .from("Products")
-        .select("*")
-        .then((val) => {
-          return val.data;
-        });
-      if (data == null) {
-        return;
-      }
-      this.products = data;
-    },
-    // New method for editing a product
-    async editProduct(product: any) {
-      if (this.supabase == undefined) {
-        return;
-      }
-      // write your logic to edit a product in the database
-      // you can use product.vendor_code as the primary key
-      // you can use prompt() or modal to get the new values from the user
-      alert(`Editing product ${product.vendor_code}`);
     },
     // New method for adding a product
     async addProduct() {
@@ -301,6 +252,9 @@ export default defineComponent({
       // write your logic to add a new product in the database
       // you can use prompt() or modal to get the values from the user
       alert(`Adding a new product`);
+    },
+    async deleteProduct(product: FullProduct) {
+      this.supabase?.from("Products").delete().eq("id", product.id);
     },
     createAccount(clientName: string) {
       // write your logic to create a new account for the client
@@ -525,6 +479,10 @@ export default defineComponent({
   cursor: pointer;
 }
 /* Editor buttons */
+.editor-actions > button {
+  width: 150px;
+  margin: 0 3px;
+}
 .editor-buttons {
   display: flex;
   align-items: center;
@@ -566,7 +524,7 @@ export default defineComponent({
 .product-editor td {
   border-bottom: 1px solid black; /* for minimalistic design */
   padding: 5px;
-  text-align: left;
+  text-align: center;
   vertical-align: top;
 }
 
