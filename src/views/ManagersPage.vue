@@ -5,7 +5,7 @@
         <h1>{{ company }}</h1>
         <button class="sign-out" @click="signOut()">Выйти</button>
       </div>
-      <div class="content">
+      <div class="content" ref="loaderAnchor">
         <div class="personal-info">
           <h2>Личная информация</h2>
           <p><strong>Имя:</strong> {{ name }}</p>
@@ -58,7 +58,10 @@
           <!-- Changed the button text to "Search and Edit Product" -->
           <button @click="toggleEditor">Найти и отредактировать продукт</button>
         </div>
-        <product-creator v-if="showCreator"></product-creator>
+        <product-creator
+          :show="showCreator"
+          @closePopUp="toggleCreator"
+        ></product-creator>
         <div class="editor-wrapper">
           <div class="product-editor" v-if="showEditor">
             <h2>Редактор продуктов</h2>
@@ -108,11 +111,7 @@
                   </td>
                   <td>
                     <!-- Using a select element for the category -->
-                    <input
-                      type="text"
-                      v-model="product.category"
-                      disabled
-                    />
+                    <input type="text" v-model="product.category" disabled />
                   </td>
                   <!-- Added a button for updating the selected product in each row -->
                   <td class="editor-actions">
@@ -182,6 +181,7 @@ export default defineComponent({
       foundProducts: [] as FullProduct[],
       // New data property for storing the categories
       categories: [] as {
+        id?: number;
         full_description: string;
       }[],
     };
@@ -203,9 +203,7 @@ export default defineComponent({
       // Modified the query to include an inner join with the Category table and select all the columns from the Products table
       let foundProducts = await this.supabase
         .from("full_products")
-        .select(
-          "id,description,price,manufacturer,img,category,vendor_code"
-        )
+        .select("id,description,price,manufacturer,img,category,vendor_code")
         .ilike("vendor_code", "%" + this.vendorCode + "%")
         .then((result) => {
           console.log("FOUND PRODUCTS ", result);
@@ -224,7 +222,7 @@ export default defineComponent({
           manufacturer: element.manufacturer,
           img: element.img,
           category: element.category,
-          vendor_code: element.vendor_code
+          vendor_code: element.vendor_code,
         };
       });
       alert(`Searching product by ${this.vendorCode}`);
@@ -254,7 +252,20 @@ export default defineComponent({
       alert(`Adding a new product`);
     },
     async deleteProduct(product: FullProduct) {
-      this.supabase?.from("Products").delete().eq("id", product.id);
+      this.supabase
+        ?.from("Products")
+        .delete()
+        .eq("id", product.id)
+        .then((elem) => {
+          if (!elem.error) {
+            let index = this.foundProducts.findIndex((elem) => {
+              return elem.id == product.id;
+            });
+            console.log(index);
+            this.foundProducts.splice(index, 1);
+            console.log("logging array length ", this.foundProducts.length);
+          }
+        });
     },
     createAccount(clientName: string) {
       // write your logic to create a new account for the client
@@ -270,6 +281,13 @@ export default defineComponent({
     if (this.supabase == undefined) {
       return;
     }
+    let loader = this.$loading.show({
+      active: true,
+      zIndex: 3,
+      isFullPage: false,
+      container: this.$refs.loaderAnchor as HTMLElement,
+      color: "#2e75b6",
+    });
     let email = this.userStore.supabaseUser.email;
     console.log("email ", email);
     let data: any = await this.supabase
@@ -352,6 +370,7 @@ export default defineComponent({
         revenue: element.overall_price,
       });
     }
+    loader.hide()
   },
 });
 </script>
@@ -405,6 +424,7 @@ export default defineComponent({
 
 /* Content */
 .content {
+  position: relative;
   display: grid;
   grid-template-areas: /* changed grid template */
     "personal-info current-orders"
@@ -490,6 +510,10 @@ export default defineComponent({
   grid-area: editor-buttons; /* added grid-area */
 }
 
+.editor-buttons button {
+  margin: 0;
+  width: max-content;
+}
 .editor-buttons label {
   color: #0a3f6c; /* for consistency */
 }

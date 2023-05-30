@@ -40,7 +40,7 @@ export default defineComponent({
   props: {
     manufacturer: {
       type: String,
-      default: "no category selected",
+      default: "makita",
     },
   },
   setup() {
@@ -86,7 +86,7 @@ export default defineComponent({
       .select(
         `*`
       )
-      .eq("manufacturer", this.manufacturer)
+      .ilike("manufacturer", this.manufacturer+'%')
       .then((value) => {
         console.log(value);
         if (value.data != null) {
@@ -108,7 +108,7 @@ export default defineComponent({
     await this.supabase
       .from("distinct_categories_for_manufacturers")
       .select("category")
-      .eq("manufacturer", this.manufacturer)
+      .ilike("manufacturer", this.manufacturer+'%')
       .then((value) => {
         if (value.data != null) {
           this.filters = value.data.map((elem)=>{

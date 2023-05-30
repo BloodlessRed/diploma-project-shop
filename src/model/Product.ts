@@ -5,9 +5,9 @@ export class Product{
         vendorCode: string;
         category:string
         price:number
-        img:string;
-        constructor(id?:number, description?:string, manufacturer?:string, category?:string, vendorCode?:string, price?:number, img?:string,){
-            if(id && description && manufacturer && category && vendorCode && price && img){
+        img?:string;
+        constructor(id?:number, description?:string, manufacturer?:string, category?:string, vendorCode?:string, price?:number, img?:string){
+            if(id && description && manufacturer && category && vendorCode && price){
                 this.id = id;
                 this.description = description
                 this.manufacturer = manufacturer
