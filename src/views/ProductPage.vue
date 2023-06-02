@@ -129,10 +129,11 @@ export default defineComponent({
           this.hasSchema=false
         });
       });
+    console.log(this.product.category)
     this.supabase
       .from("full_products")
       .select(`*`)
-      .eq("Categories.full_description", this.product.category)
+      .eq("category", this.product.category)
       .then((value) => {
         console.log("Affiliated products are ", value);
         value.data?.map((item) => {

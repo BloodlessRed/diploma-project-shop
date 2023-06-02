@@ -28,7 +28,7 @@
             <tbody>
               <tr v-for="order in orders" :key="order.id">
                 <td>{{ order.id }}</td>
-                <td>{{ order.clientCompany }}</td>
+                <td>{{ order.clientNote.orgName }}</td>
                 <td>
                   <span v-for="product in order.products"
                     >[{{ product.vendor_code }} - {{ product.amount }}] <br
@@ -38,7 +38,7 @@
                 <td><a :href="order.document">Коммерческое предложение</a></td>
                 <td>
                   <!-- Removed the v-if condition as it was always true -->
-                  <button @click="createAccount(order.clientCompany)">
+                  <button v-if="!order.client" @click="createAccount(order.clientNote)">
                     Создать аккаунт
                   </button>
                 </td>
@@ -53,15 +53,11 @@
           <label for="editor-buttons">Действия с продуктом:</label>
 
           <!-- Added a button for adding a new product -->
-          <button @click="toggleCreator">Добавить продукт</button>
+          <button @click="toggleCreator('product')">Добавить продукт</button>
 
           <!-- Changed the button text to "Search and Edit Product" -->
           <button @click="toggleEditor">Найти и отредактировать продукт</button>
         </div>
-        <product-creator
-          :show="showCreator"
-          @closePopUp="toggleCreator"
-        ></product-creator>
         <div class="editor-wrapper">
           <div class="product-editor" v-if="showEditor">
             <h2>Редактор продуктов</h2>
@@ -130,11 +126,17 @@
       </div>
     </div>
   </div>
+  <product-creator
+    :show="showProductCreator"
+    @close-pop-up="toggleCreator"
+  />
+<account-creator :info="clientInfo" :show="showAccountCreator" @close-pop-up="toggleCreator" @update-orders=""/>
 </template>
 <script lang="ts">
 import { useCurrentUserStore } from "@/stores/currentUser";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import ProductCreator from "./ProductCreator.vue";
+import AccountCreator from "./AccountCreator.vue";
 import { defineComponent, inject } from "vue";
 type FullProduct = {
   id: any;
@@ -154,6 +156,7 @@ export default defineComponent({
   },
   components: {
     ProductCreator,
+    AccountCreator
   },
   data() {
     return {
@@ -165,16 +168,19 @@ export default defineComponent({
       orders: [
         {
           id: 1,
-          clientCompany: "Alice Brown",
+          clientNote: {} as any,
           document: "Laptop",
           products: [] as any[],
           revenue: 1000,
+          client:""
         },
       ],
+      clientInfo:{},
       products: [] as any[],
       // New data property for controlling the visibility of the product editor
       showEditor: false,
-      showCreator: false,
+      showProductCreator: false,
+      showAccountCreator:false,
       // New data property for storing the input value of the vendor code
       vendorCode: "",
       // Modified data property for storing the found products
@@ -187,9 +193,22 @@ export default defineComponent({
     };
   },
   methods: {
+    updateOrdersWithCompanyId(array:number[],id:number){
+      let selectedOrders = this.orders.filter((elem)=>{
+         return array.includes(elem.id)
+      })
+      selectedOrders.forEach((elem)=>{
+        elem.client = id.toString()
+      })
+    },
     // New method for toggling the product adder
-    toggleCreator() {
-      this.showCreator = !this.showCreator;
+    toggleCreator(eventType:string) {
+      if(eventType == "product"){
+        this.showProductCreator = !this.showProductCreator;
+      } else if (eventType == "account"){
+        this.showAccountCreator = !this.showAccountCreator
+      }
+      
     },
     // Modified method for toggling the product editor
     toggleEditor() {
@@ -214,7 +233,6 @@ export default defineComponent({
         });
       // Assigning the whole array of the found products to the foundProducts data property
       this.foundProducts = foundProducts.map((element) => {
-        let category = element.category;
         return {
           id: element.id,
           description: element.description,
@@ -267,9 +285,11 @@ export default defineComponent({
           }
         });
     },
-    createAccount(clientName: string) {
+    createAccount(clientNote: any) {
+
       // write your logic to create a new account for the client
-      alert(`Creating account for ${clientName}`);
+      this.showAccountCreator = !this.showAccountCreator
+      this.clientInfo = clientNote
     },
     signOut() {
       this.supabase?.auth.signOut();
@@ -364,13 +384,14 @@ export default defineComponent({
           : productsToBeDisplayed;
       this.orders.push({
         id: element.order_id,
-        clientCompany: clientsNote.orgName,
+        clientNote: clientsNote,
         products: productsToBeDisplayed,
         document: link,
         revenue: element.overall_price,
+        client: element.company_id
       });
     }
-    loader.hide()
+    loader.hide();
   },
 });
 </script>

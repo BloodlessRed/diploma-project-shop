@@ -2,7 +2,7 @@
   <teleport to="body">
     <div class="overlay" v-if="show"></div>
     <form class="product-creator" v-show="show" @submit="submitProduct">
-      <span @click="$emit('closePopUp')" class="close-button">Закрыть</span>
+      <span @click="$emit('closePopUp','product')" class="close-button">Закрыть</span>
       <h2>Создание продукта</h2>
       <!-- Input elements for the new product fields -->
       <div class="product-fields">

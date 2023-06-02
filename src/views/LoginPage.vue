@@ -49,9 +49,12 @@ export default defineComponent({
           this.user.setNewUser(currentUser)
           if(currentUser.user_metadata.role == "manager"){
             this.$router.push({
-            name: "ManagersPage",
-            params: { manager: currentUser.email },
+            name: "ManagersPage"          
           });
+          } else if (currentUser.user_metadata.role == "client"){
+            this.$router.push({
+              name:"ClientsPage"
+            })
           }
         }
       }

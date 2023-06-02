@@ -172,20 +172,6 @@
         </div>
         <div class="input-field-wrapper">
           <div class="separator">
-            <label class="field-title active">Адрес доставки</label>
-            <textarea
-              cols="501"
-              rows="6"
-              name="customf[address][value]"
-              data-oneline=""
-              placeholder="Индекс, область, населенный пункт, улица, дом, квартира"
-              class="inp"
-              v-model="address"
-            ></textarea>
-          </div>
-        </div>
-        <div class="input-field-wrapper">
-          <div class="separator">
             <label class="field-title">Комментарий</label>
             <textarea
               cols="501"
@@ -195,18 +181,6 @@
               class="inp"
               v-model="comment"
             ></textarea>
-          </div>
-        </div>
-        <div class="input-field-wrapper">
-          <div class="separator">
-            <label class="field-title active">Загрузить карту партнера</label>
-            <div class="file-field">
-              <input
-                name="customfile_Загрузить карту партнера"
-                value=""
-                type="file"
-              />
-            </div>
           </div>
         </div>
         <div class="input-field-wrapper">

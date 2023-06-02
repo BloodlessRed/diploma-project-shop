@@ -43,9 +43,9 @@ export const useCurrentUserStore = defineStore("currentUser", {
         }
       } else if (this.role === "client") {
         const { data, error } = await this.supabase
-          .from("Clients")
+          .from("Companies")
           .select("*")
-          .eq("email", this.supabaseUser?.email)
+          .eq("login", this.supabaseUser?.email)
           .single();
         if (error) {
           console.error(error);
