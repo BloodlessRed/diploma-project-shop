@@ -23,6 +23,7 @@
                 <!-- Renamed the revenue column to "Общая стоимость" -->
                 <th>Общая стоимость</th>
                 <th>Документ</th>
+                <th>Статус</th>
               </tr>
             </thead>
             <tbody>
@@ -43,6 +44,7 @@
                     >Коммерческое предложение</a
                   >
                 </td>
+                <td>{{ order.status }}</td>
               </tr>
             </tbody>
           </table>
@@ -77,6 +79,7 @@ export default defineComponent({
           id: 1,
           document: "Laptop",
           products: [] as any[],
+          status: "новый",
           revenue: 1000,
         },
       ],
@@ -125,7 +128,7 @@ export default defineComponent({
     let temp_order_ids = [];
     for (let i = 0; i < data.length; i++) {
       let element = data[i];
-      console.log(element)
+      console.log(element);
       temp_order_ids.push(element.order_id);
     }
     let products = await this.supabase
@@ -182,6 +185,7 @@ export default defineComponent({
         id: element.order_id,
         products: productsToBeDisplayed,
         document: link,
+        status: element.status,
         revenue: element.overall_price,
       });
     }
@@ -295,11 +299,12 @@ export default defineComponent({
 .current-orders td {
   border-bottom: 1px solid black; /* for minimalistic design */
 
-  padding: 5px;
+  padding: 5px 15px;
 
   text-align: left;
 
   vertical-align: top;
+  text-align: center;
 }
 
 .current-orders th {

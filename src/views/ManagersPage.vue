@@ -22,6 +22,7 @@
                 <th>Продукт</th>
                 <th>Выручка</th>
                 <th>Документ</th>
+                <th>Статус</th>
                 <th>Действие</th>
               </tr>
             </thead>
@@ -36,10 +37,23 @@
                 </td>
                 <td>{{ order.revenue }}</td>
                 <td><a :href="order.document">Коммерческое предложение</a></td>
+                <td>{{ order.status }}</td>
                 <td>
                   <!-- Removed the v-if condition as it was always true -->
-                  <button v-if="!order.client" @click="createAccount(order.clientNote)">
+                  <button
+                    v-if="!order.client"
+                    @click="createAccount(order.clientNote)"
+                  >
                     Создать аккаунт
+                  </button>
+                  <button
+                    v-if="order.status == 'новый'"
+                    @click="changeStatus('в работе', order)"
+                  >
+                    Начать работу
+                  </button>
+                  <button v-if="order.status == 'в работе'" @click="changeStatus('завершено', order)">
+                    Закрыть сделку
                   </button>
                 </td>
               </tr>
@@ -126,11 +140,13 @@
       </div>
     </div>
   </div>
-  <product-creator
-    :show="showProductCreator"
+  <product-creator :show="showProductCreator" @close-pop-up="toggleCreator" />
+  <account-creator
+    :info="clientInfo"
+    :show="showAccountCreator"
     @close-pop-up="toggleCreator"
+    @update-orders="updateOrdersWithCompanyId"
   />
-<account-creator :info="clientInfo" :show="showAccountCreator" @close-pop-up="toggleCreator" @update-orders="updateOrdersWithCompanyId"/>
 </template>
 <script lang="ts">
 import { useCurrentUserStore } from "@/stores/currentUser";
@@ -147,7 +163,15 @@ type FullProduct = {
   category?: string;
   vendor_code: string;
 };
-
+type Order = {
+  id: number,
+          clientNote: any,
+          document: string,
+          products: any[],
+          revenue: number,
+          status:string,
+          client:string
+}
 export default defineComponent({
   name: "ManagersPage",
   setup() {
@@ -172,8 +196,9 @@ export default defineComponent({
           document: "Laptop",
           products: [] as any[],
           revenue: 1000,
+          status:"новый",
           client:""
-        },
+        } as Order,
       ],
       clientInfo:{},
       products: [] as any[],
@@ -193,6 +218,10 @@ export default defineComponent({
     };
   },
   methods: {
+   async changeStatus(newStatus:string, order: Order){
+      let status:string = await this.supabase?.from("Orders").update({status:newStatus}).eq('order_id',order.id).select().single().then((resp)=>resp.data == null ? '' : resp.data.status)
+      order.status = newStatus
+    },
     updateOrdersWithCompanyId(array:number[],id:number){
       let selectedOrders = this.orders.filter((elem)=>{
          return array.includes(elem.id)
@@ -209,7 +238,7 @@ export default defineComponent({
       } else if (eventType == "account"){
         this.showAccountCreator = !this.showAccountCreator
       }
-      
+
     },
     // Modified method for toggling the product editor
     toggleEditor() {
@@ -389,6 +418,7 @@ export default defineComponent({
         products: productsToBeDisplayed,
         document: link,
         revenue: element.overall_price,
+        status:element.status,
         client: element.company_id
       });
     }
@@ -493,9 +523,10 @@ export default defineComponent({
 .current-orders th,
 .current-orders td {
   border-bottom: 1px solid black; /* for minimalistic design */
-  padding: 5px;
+  padding: 5px 10px;
   text-align: left;
   vertical-align: top;
+  text-align: center;
 }
 
 .current-orders th {
@@ -615,6 +646,7 @@ button {
   padding: 5px 10px;
   cursor: pointer;
   width: 200px; /* added width */
+  margin-right: 2px;
   margin-bottom: 10px; /* added margin */
 }
 </style>
