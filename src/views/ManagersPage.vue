@@ -130,7 +130,7 @@
     :show="showProductCreator"
     @close-pop-up="toggleCreator"
   />
-<account-creator :info="clientInfo" :show="showAccountCreator" @close-pop-up="toggleCreator" @update-orders=""/>
+<account-creator :info="clientInfo" :show="showAccountCreator" @close-pop-up="toggleCreator" @update-orders="updateOrdersWithCompanyId"/>
 </template>
 <script lang="ts">
 import { useCurrentUserStore } from "@/stores/currentUser";
@@ -197,6 +197,7 @@ export default defineComponent({
       let selectedOrders = this.orders.filter((elem)=>{
          return array.includes(elem.id)
       })
+      console.log(selectedOrders)
       selectedOrders.forEach((elem)=>{
         elem.client = id.toString()
       })

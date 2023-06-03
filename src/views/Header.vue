@@ -29,7 +29,7 @@
       <img :src="`/img/to-account.svg`" />
       <span>Войти</span>
       </div>
-      <div v-else @click="navigate('ManagersPage')" class="to-account">
+      <div v-else @click="navigateToAccount(user.role)" class="to-account">
         <img :src="`/img/to-account.svg`" />
         <span>{{ user.userInfo.full_name }}</span>
       </div>
@@ -88,6 +88,13 @@ export default defineComponent({
         alert("Введите артикул товара в поисковую строку");
       }
     },
+    navigateToAccount(role:string){
+      if(role=='manager'){
+        this.$router.push({ name: 'ManagersPage' });
+      } else if (role == 'client'){
+        this.$router.push({ name: 'ClientsPage' });
+      }
+    }
   },
   async mounted() {
     if (this.supabase == undefined) {

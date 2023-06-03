@@ -88,7 +88,7 @@ import { useCurrentUserStore } from "@/stores/currentUser";
 
 export default defineComponent({
   name: "AccountCreator",
-  emits: ["closePopUp","updateOrders"],
+  emits: ["closePopUp", "updateOrders"],
   props: {
     show: {
       type: Boolean,
@@ -116,14 +116,21 @@ export default defineComponent({
       rep_name: "",
       rep_email: "",
       rep_phone: "",
-      currentUser: useCurrentUserStore()
+      currentUser: useCurrentUserStore(),
     };
   },
   methods: {
     // Method for submitting the new account
     async submitAccount(e: Event) {
       e.preventDefault();
+      let loader = this.$loading.show({
+        active: true,
+        isFullPage: true,
+        zIndex: 3,
+        color: "#2e75b6",
+      });
       if (this.supabase == undefined) {
+        loader.hide();
         return;
       }
       if (
@@ -139,11 +146,12 @@ export default defineComponent({
         )
       ) {
         alert("Заполните все необходимые поля!");
+        loader.hide()
         return;
       }
-      let [orgType, orgName] = this.company_name.split(/ (.*)/)
-      orgName = orgName.slice(1,-1)
-      console.log(orgType,' | ',orgName)
+      let [orgType, orgName] = this.company_name.split(/ (.*)/);
+      orgName = orgName.slice(1, -1);
+      console.log(orgType, " | ", orgName);
       let newUser = await this.supabase.auth.signUp({
         email: this.login,
         password: this.password,
@@ -153,24 +161,34 @@ export default defineComponent({
           },
         },
       });
-      await this.supabase.auth.signOut()
-      await this.supabase.auth.signInWithPassword({email:this.currentUser.userInfo.login, password:this.currentUser.userInfo.password})
+      await this.supabase.auth.signOut();
+      await this.supabase.auth.signInWithPassword({
+        email: this.currentUser.userInfo.login,
+        password: this.currentUser.userInfo.password,
+      });
       console.log("Created User ", newUser);
-      console.log("Current user now is ", await this.supabase.auth.getUser())
+      console.log("Current user now is ", await this.supabase.auth.getUser());
       let representative = await this.supabase
         .from("Clients")
-        .upsert({
-          full_name: this.rep_name,
-          email: this.rep_email,
-          phone: this.rep_phone,
-        },{
-          onConflict:'phone'
-        })
+        .upsert(
+          {
+            full_name: this.rep_name,
+            email: this.rep_email,
+            phone: this.rep_phone,
+          },
+          {
+            onConflict: "phone",
+          }
+        )
         .select()
         .single()
-        .then((resp) => {console.log(resp); return resp.data});
+        .then((resp) => {
+          console.log(resp);
+          return resp.data;
+        });
       if (representative == null) {
         alert("Не удалось создать представителя. Попробуйте сохранить еще раз");
+        loader.hide()
         return;
       }
       let companyInfo = {
@@ -188,27 +206,40 @@ export default defineComponent({
         .insert(companyInfo)
         .select()
         .single()
-        .then((resp) => {console.log(resp); return resp.data});
+        .then((resp) => {
+          console.log(resp);
+          return resp.data;
+        });
       if (company == null) {
         alert(
           "Не удалось завершить создание аккаунта. Попробуйте сохранить еще раз"
         );
+        loader.hide()
         return;
       }
-      console.log('%'+orgType+'%'+orgName+'%')
-      let {data} = await this.supabase.from('Orders').select('order_id').ilike('note','%'+orgType+'%'+orgName+'%')
-      if (data == undefined){
+      console.log("%" + orgType + "%" + orgName + "%");
+      let { data } = await this.supabase
+        .from("Orders")
+        .select("order_id")
+        .ilike("note", "%" + orgType + "%" + orgName + "%");
+      if (data == undefined) {
         alert(
           "Не удалось завершить создание аккаунта. Попробуйте сохранить еще раз"
         );
-        return
+        loader.hide()
+        return;
       }
-      let orderIdArr = data.map((elem)=>parseInt(elem.order_id))
-      console.log(orderIdArr)
-      console.log(company.id)
-      await this.supabase.from('Orders').update({company_id:company.id}).in('order_id',orderIdArr).select('*').then((res)=>console.log(res))
-      this.$emit('updateOrders',orderIdArr,company.id)
-      alert(`Создание аккаунта ${this.login}`);
+      let orderIdArr = data.map((elem) => parseInt(elem.order_id));
+      console.log(orderIdArr);
+      console.log(company.id);
+      await this.supabase
+        .from("Orders")
+        .update({ company_id: company.id })
+        .in("order_id", orderIdArr)
+        .select("*")
+        .then((res) => console.log(res));
+      this.$emit("updateOrders", orderIdArr, company.id);
+      loader.hide()
     },
   },
   watch: {

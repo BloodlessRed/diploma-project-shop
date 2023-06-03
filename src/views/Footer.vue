@@ -13,7 +13,7 @@
           :to="{ name: 'Manufacturer', params: { manufacturer: supplier } }"
           v-for="supplier in suppliers"
         >
-          {{ supplier }}
+          {{ supplier[0].toUpperCase() + supplier.slice(1,supplier.length) }}
         </router-link>
       </div>
       <div class="site-section">
@@ -32,9 +32,14 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { defineComponent, inject } from "vue";
 
 export default defineComponent({
+  setup() {
+    let supabase: SupabaseClient | undefined = inject("supabase");
+    return { supabase };
+  },
   data() {
     return {
       imgSrc: "logo.svg",
@@ -48,6 +53,24 @@ export default defineComponent({
       console.log("Hello world!");
     },
   },
+  async mounted() {
+      if(this.supabase == undefined){
+        console.log("supabase is undefined")
+        return
+      }
+      this.suppliers = await this.supabase
+        .from("Manufacturers")
+        .select("manufacturer")
+        .then((resp) => {
+          console.log(resp)
+          if (resp.data != undefined || resp.data != null) {
+            return resp.data.map((elem)=>elem.manufacturer) 
+          } else{
+            return []
+          }
+        }) as string[];
+    },
+
 });
 </script>
 <style scoped>
