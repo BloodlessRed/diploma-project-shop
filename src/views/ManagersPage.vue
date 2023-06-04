@@ -52,7 +52,10 @@
                   >
                     Начать работу
                   </button>
-                  <button v-if="order.status == 'в работе'" @click="changeStatus('завершено', order)">
+                  <button
+                    v-if="order.status == 'в работе'"
+                    @click="changeStatus('завершено', order)"
+                  >
                     Закрыть сделку
                   </button>
                 </td>
@@ -164,14 +167,14 @@ type FullProduct = {
   vendor_code: string;
 };
 type Order = {
-  id: number,
-          clientNote: any,
-          document: string,
-          products: any[],
-          revenue: number,
-          status:string,
-          client:string
-}
+  id: number;
+  clientNote: any;
+  document: string;
+  products: any[];
+  revenue: number;
+  status: string;
+  client: string;
+};
 export default defineComponent({
   name: "ManagersPage",
   setup() {
@@ -180,7 +183,7 @@ export default defineComponent({
   },
   components: {
     ProductCreator,
-    AccountCreator
+    AccountCreator,
   },
   data() {
     return {
@@ -196,16 +199,16 @@ export default defineComponent({
           document: "Laptop",
           products: [] as any[],
           revenue: 1000,
-          status:"новый",
-          client:""
+          status: "новый",
+          client: "",
         } as Order,
       ],
-      clientInfo:{},
+      clientInfo: {},
       products: [] as any[],
       // New data property for controlling the visibility of the product editor
       showEditor: false,
       showProductCreator: false,
-      showAccountCreator:false,
+      showAccountCreator: false,
       // New data property for storing the input value of the vendor code
       vendorCode: "",
       // Modified data property for storing the found products
@@ -218,27 +221,32 @@ export default defineComponent({
     };
   },
   methods: {
-   async changeStatus(newStatus:string, order: Order){
-      let status:string = await this.supabase?.from("Orders").update({status:newStatus}).eq('order_id',order.id).select().single().then((resp)=>resp.data == null ? '' : resp.data.status)
-      order.status = newStatus
+    async changeStatus(newStatus: string, order: Order) {
+      let status: string = await this.supabase
+        ?.from("Orders")
+        .update({ status: newStatus })
+        .eq("order_id", order.id)
+        .select()
+        .single()
+        .then((resp) => (resp.data == null ? "" : resp.data.status));
+      order.status = newStatus;
     },
-    updateOrdersWithCompanyId(array:number[],id:number){
-      let selectedOrders = this.orders.filter((elem)=>{
-         return array.includes(elem.id)
-      })
-      console.log(selectedOrders)
-      selectedOrders.forEach((elem)=>{
-        elem.client = id.toString()
-      })
+    updateOrdersWithCompanyId(array: number[], id: number) {
+      let selectedOrders = this.orders.filter((elem) => {
+        return array.includes(elem.id);
+      });
+      console.log(selectedOrders);
+      selectedOrders.forEach((elem) => {
+        elem.client = id.toString();
+      });
     },
     // New method for toggling the product adder
-    toggleCreator(eventType:string) {
-      if(eventType == "product"){
+    toggleCreator(eventType: string) {
+      if (eventType == "product") {
         this.showProductCreator = !this.showProductCreator;
-      } else if (eventType == "account"){
-        this.showAccountCreator = !this.showAccountCreator
+      } else if (eventType == "account") {
+        this.showAccountCreator = !this.showAccountCreator;
       }
-
     },
     // Modified method for toggling the product editor
     toggleEditor() {
@@ -316,10 +324,9 @@ export default defineComponent({
         });
     },
     createAccount(clientNote: any) {
-
       // write your logic to create a new account for the client
-      this.showAccountCreator = !this.showAccountCreator
-      this.clientInfo = clientNote
+      this.showAccountCreator = !this.showAccountCreator;
+      this.clientInfo = clientNote;
     },
     signOut() {
       this.supabase?.auth.signOut();
@@ -418,8 +425,8 @@ export default defineComponent({
         products: productsToBeDisplayed,
         document: link,
         revenue: element.overall_price,
-        status:element.status,
-        client: element.company_id
+        status: element.status,
+        client: element.company_id,
       });
     }
     loader.hide();

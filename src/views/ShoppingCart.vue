@@ -571,7 +571,7 @@ td {
   align-items: center;
   justify-content: space-evenly;
   width: 30%;
-  margin: 0 0 20% 5%;
+  margin: 0 0 10% 5%;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 .receipt-price > input {
