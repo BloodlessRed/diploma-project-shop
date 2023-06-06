@@ -95,7 +95,7 @@ export default defineComponent({
     return {
       // Data properties for the new product fields
       description: "",
-      price: 0,
+      price: undefined,
       manufacturer: "",
       img: "",
       category: "",
@@ -304,14 +304,17 @@ export default defineComponent({
       if (this.supabase == undefined) {
         return;
       }
-      console.log(await this.supabase.auth.getUser())
+      if(this.price == undefined || this.price <=0){
+        alert("Цена не может быть меньше либо равна нулю! Поставьте правильную цену")
+        return
+      }
       await this.supabase.from("Products").insert({
         description: this.description,
         price: this.price,
         manufacturer: this.manufacturers.find((item) => {
           return item.manufacturer == this.manufacturer;
         })?.id,
-        img: "",
+        img: "no_img",
         category: this.categories.find((item) => {
          return item.full_description == this.category;
         })?.id,

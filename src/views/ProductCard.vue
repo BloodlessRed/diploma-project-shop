@@ -1,6 +1,7 @@
 <template>
   <div class="item">
-    <img :src="`./img/${passed_product.img}-Nutrunners.svg`" />
+    <img v-if="passed_product.img != 'no_img'" :src="`./img/${passed_product.img}-Nutrunners.svg`" />
+    <img v-else :src="`./img/${passed_product.img}.svg`"/>
     <h3>{{ passed_product.vendorCode }}</h3>
     <router-link
       :to="{

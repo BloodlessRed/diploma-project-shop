@@ -2,7 +2,8 @@
   <div class="main-wrapper">
     <div class="product">
       <div class="img-container">
-        <img :src="`../img/${product.img}-Nutrunners.svg`" alt="" />
+        <img v-if="product.img != 'no_img'" :src="`../img/${product.img}-Nutrunners.svg`" :alt="product.img" />
+        <img v-else :src="`../img/${product.img}.svg`" :alt="product.img" />
       </div>
       <div class="product-info">
         <h1>{{ product.vendorCode }}</h1>

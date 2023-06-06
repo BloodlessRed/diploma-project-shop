@@ -133,5 +133,6 @@ a {
 }
 .address {
   color: white;
+  text-align: center;
 }
 </style>
